@@ -80,11 +80,7 @@ body{
 }
 .nav-tab.on{background:var(--sky50); color:var(--sky800)}
 .nav-tab:focus-visible{outline:2px solid var(--sky); outline-offset:1px}
-.nav-tab .cnt{
-  font-size:10px; background:var(--sky100); color:var(--sky800);
-  padding:1px 6px; border-radius:20px; font-weight:800;
-}
-.nav-tab.on .cnt{background:var(--sky); color:#fff}
+.nav-tab .cnt{display:none;}
 
 /* 메인 — fixed 헤더 높이만큼 padding-top은 JS가 동적으로 설정 */
 .main{padding:16px 14px 60px}
@@ -140,12 +136,12 @@ body{
   background:var(--purple50); color:var(--purple800); flex-shrink:0; letter-spacing:.02em;
 }
 .lead{
-  font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
-  flex-shrink:0; letter-spacing:.02em;
+  font-size:11px; font-weight:800; padding:2px 9px; border-radius:20px;
+  flex-shrink:0; letter-spacing:.04em;
 }
-.lead.t1{background:var(--coral50); color:var(--coral800)}
-.lead.t2{background:var(--sky50); color:var(--sky800)}
-.lead.t3{background:var(--gray50); color:var(--gray600)}
+.lead.t1{background:var(--coral); color:#fff}
+.lead.t2{background:var(--sky); color:#fff}
+.lead.t3{background:#8B96A8; color:#fff}
 .stock-desc{font-size:13.5px; color:var(--txt); margin-top:7px; line-height:1.7; font-weight:400; letter-spacing:-.01em}
 
 /* 디스클레이머 */
@@ -192,8 +188,8 @@ body{
 
 /* ── 핵심 종목 뱃지 ── */
 .key-badge{
-  font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px;
-  background:linear-gradient(135deg,var(--coral),#e8743a);
+  font-size:11px; font-weight:800; padding:2px 8px; border-radius:20px;
+  background:linear-gradient(135deg,#6B3FA0,#9B5FD0);
   color:#fff; letter-spacing:.03em; flex-shrink:0;
 }
 .stock-key{
@@ -298,7 +294,6 @@ body{
 /* 소형 모바일(≤380px): 탭 글자 잘림 방지, 카드 패딩 축소 */
 @media(max-width:380px){
   .nav-tab{font-size:11px; padding:6px 8px; min-height:44px; letter-spacing:-.03em;}
-  .nav-tab .cnt{display:none;}
   .hdr h1{font-size:15px;}
   .hdr-sub span,.hdr-date{font-size:10px;}
   .main{padding:12px 10px 60px;}
@@ -332,7 +327,7 @@ body{
         <h1>주식 밸류체인</h1>
         <div class="hdr-sub">
           <span>분야별 핵심 종목 · 밸류체인 단계별 정리</span>
-          <span class="hdr-date">업데이트 2026.05.30 · Q1실적 반영</span>
+          <span class="hdr-date">업데이트 2026.05.30</span>
         </div>
       </div>
     </div>
