@@ -151,11 +151,11 @@ body{
 
 /* 범례 */
 .legend{
-  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;
-  font-size:11.5px; color:var(--txt2);
+  display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;
+  font-size:14px; color:var(--txt);
 }
-.legend span{display:flex; align-items:center; gap:5px; font-weight:600}
-.dot{width:10px; height:10px; border-radius:50%}
+.legend span{display:flex; align-items:center; gap:6px; font-weight:700}
+.dot{width:12px; height:12px; border-radius:50%; flex-shrink:0}
 
 /* 디스클레이머 */
 .disc{
@@ -165,6 +165,86 @@ body{
 }
 .disc b{font-weight:800}
 
+/* ── 티어 분포 차트 ── */
+.tier-chart{
+  margin-top:12px; padding:12px 14px; border-radius:var(--r12);
+  background:#fff; border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.tier-chart-label{
+  font-size:16px; font-weight:800; color:var(--txt);
+  margin-bottom:12px; letter-spacing:.01em;
+}
+.tier-chart-label{
+  font-size:13px; font-weight:800; color:var(--txt2);
+  margin-bottom:10px; letter-spacing:.01em;
+}
+.tier-bar-row{
+  display:flex; align-items:center; gap:10px; margin-bottom:7px;
+}
+.tier-bar-row:last-child{margin-bottom:0}
+.tier-bar-name{
+  font-size:13px; font-weight:800; min-width:30px; color:var(--txt);
+  letter-spacing:-.01em;
+}
+.tier-bar-track{
+  flex:1; height:12px; border-radius:6px;
+  background:var(--border); overflow:hidden;
+}
+.tier-bar-fill{
+  height:100%; border-radius:6px;
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+}
+.tier-bar-fill.t1{background:var(--coral)}
+.tier-bar-fill.t2{background:var(--sky)}
+.tier-bar-fill.t3{background:var(--gray600)}
+.tier-bar-count{
+  font-size:14px; font-weight:900; min-width:32px; text-align:right;
+  letter-spacing:-.02em;
+}
+.tier-bar-count.t1{color:var(--coral800)}
+.tier-bar-count.t2{color:var(--sky800)}
+.tier-bar-count.t3{color:#3a3937}
+
+/* ── 교차 종목 탭 ── */
+.nav-tab.cross-tab{color:var(--purple800);}
+.nav-tab.cross-tab.on{background:var(--purple50); color:var(--purple800);}
+.nav-tab.cross-tab .cnt{background:var(--purple50); color:var(--purple800);}
+.nav-tab.cross-tab.on .cnt{background:var(--purple); color:#fff;}
+#cross-panel{display:none; animation:fadeIn .2s ease;}
+#cross-panel.vis{display:block;}
+.cross-section-hd{
+  font-size:12px; font-weight:800; color:var(--txt3);
+  padding:6px 2px; letter-spacing:.02em;
+  border-bottom:1px solid var(--border2); margin-bottom:8px; margin-top:4px;
+}
+.cross-section-hd:first-child{margin-top:0}
+
+/* ── 업데이트 날짜 ── */
+.stock-date{
+  font-size:10.5px; color:var(--txt3); font-weight:500;
+  margin-top:5px; display:flex; align-items:center; gap:4px;
+}
+.stock-date-dot{
+  width:5px; height:5px; border-radius:50%; background:var(--teal); opacity:.7; flex-shrink:0;
+}
+.stock-date.recent .stock-date-dot{background:var(--teal); opacity:1;}
+.stock-date.old .stock-date-dot{background:var(--gray600); opacity:.5;}
+
+
+/* ── 핵심 종목 뱃지 ── */
+.key-badge{
+  font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px;
+  background:linear-gradient(135deg,var(--coral),#e8743a);
+  color:#fff; letter-spacing:.03em; flex-shrink:0;
+}
+.stock-key{
+  border-color:var(--coral50);
+  box-shadow:0 2px 12px rgba(216,90,48,.12);
+}
+.stock-key:hover{
+  box-shadow:0 6px 24px rgba(216,90,48,.2);
+}
 
 /* ── 즐겨찾기 버튼 (카드 우측 상단) ── */
 .fav-btn{
@@ -308,13 +388,15 @@ body{
     </div>
   </div>
   <div class="main">
-    <div class="legend">
-      <span><i class="dot" style="background:var(--coral)"></i>독보적·글로벌 1위급</span>
-      <span><i class="dot" style="background:var(--sky)"></i>국내 선두·과점</span>
-      <span><i class="dot" style="background:var(--gray600)"></i>성장·초기 단계</span>
-    </div>
     <div id="fav-panel"></div>
-    <div id="content"></div>
+    <div id="cross-panel"></div>
+    <div id="content">
+      <div class="legend" id="legend">
+        <span><i class="dot" style="background:var(--coral)"></i>독보적·글로벌 1위급</span>
+        <span><i class="dot" style="background:var(--sky)"></i>국내 선두·과점</span>
+        <span><i class="dot" style="background:var(--gray600)"></i>성장·초기 단계</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -326,34 +408,34 @@ const DATA = [
     strength:{type:'pos', txt:'HBM4 세대교체·소부장 글로벌 독점 — 단, 기대 선반영으로 밸류 부담'},
     stages:[
       {t:'AI 메모리(HBM)', s:'밸류체인 최상단', stocks:[
-        {n:'SK하이닉스', code:'000660', tier:1, d:'HBM 글로벌 1위(점유율 57%). HBM3E 과점 수성 + HBM4 공급 체계 구축. 구글 TPU v7 첫 공급사'},
-        {n:'삼성전자', code:'005930', tier:1, d:'\'26.02 HBM4 세계 최초 양산 발표. 종합 메모리 1위 + 파운드리 병행'},
+        {n:'SK하이닉스', code:'000660', tier:1, upd:'2026-05-30', d:'HBM 글로벌 1위(점유율 57%). HBM3E 과점 수성 + HBM4 공급 체계 구축. 구글 TPU v7 첫 공급사'},
+        {n:'삼성전자', code:'005930', tier:1, upd:'2026-05-30', d:'\'26.02 HBM4 세계 최초 양산 발표. 종합 메모리 1위 + 파운드리 병행'},
       ]},
       {t:'AI 칩 설계', s:'팹리스·디자인하우스', stocks:[
-        {n:'가온칩스', code:'399720', tier:2, d:'AI 칩 디자인하우스. 고객 설계를 실제 반도체로 구현하는 구조적 성장'},
-        {n:'오픈엣지테크놀로지', code:'394280', tier:2, d:'저전력 설계 IP. 온디바이스 AI 확산 직접 수혜'},
-        {n:'DB하이텍', code:'000990', tier:2, d:'전력 반도체 전문 파운드리. AI 시대 전력 효율 이슈 수혜'},
+        {n:'가온칩스', code:'399720', tier:2, upd:'2026-04-20', d:'AI 칩 디자인하우스. 고객 설계를 실제 반도체로 구현하는 구조적 성장'},
+        {n:'오픈엣지테크놀로지', code:'394280', tier:2, upd:'2026-04-20', d:'저전력 설계 IP. 온디바이스 AI 확산 직접 수혜'},
+        {n:'DB하이텍', code:'000990', tier:2, upd:'2026-04-15', d:'전력 반도체 전문 파운드리. AI 시대 전력 효율 이슈 수혜'},
       ]},
       {t:'장비·소켓', s:'본딩·테스트', stocks:[
-        {n:'한미반도체', code:'042700', tier:1, d:'HBM 본딩 장비(TC본더) 사실상 독점 공급. HBM4 전환 최대 수혜'},
-        {n:'ISC', code:'095340', tier:2, d:'테스트 소켓. AI 서버 테스트 공정 급증 직접 수혜'},
-        {n:'브이엠(VM)', code:'363140', tier:2, d:'HBM 공정 장비 NVIDIA 공급망 진입. \'26 하반기 수주 확대 기대'},
+        {n:'한미반도체', code:'042700', tier:1, upd:'2026-05-30', d:'HBM 본딩 장비(TC본더) 사실상 독점 공급. HBM4 전환 최대 수혜'},
+        {n:'ISC', code:'095340', tier:2, upd:'2026-04-10', d:'테스트 소켓. AI 서버 테스트 공정 급증 직접 수혜'},
+        {n:'브이엠(VM)', code:'363140', tier:2, upd:'2026-05-01', d:'HBM 공정 장비 NVIDIA 공급망 진입. \'26 하반기 수주 확대 기대'},
       ]},
       {t:'기판·PCB', s:'고난도 미세화', stocks:[
-        {n:'이수페타시스', code:'007660', tier:2, d:'AI 서버용 고다층(MLB) PCB. AI 데이터센터 증설 직결'},
-        {n:'삼성전기', code:'009150', tier:2, d:'FC-BGA 등 고난도 패키지 기판. 아이폰17 기대감 교차 수혜'},
-        {n:'LG이노텍', code:'011070', tier:2, d:'FC-BGA·반도체 기판 + AI 전장 부품 교차 수혜'},
-        {n:'기가비스', code:'435870', tier:3, d:'PCB 검사 장비. 기판 난도 상승 수혜'},
+        {n:'이수페타시스', code:'007660', tier:2, upd:'2026-04-25', d:'AI 서버용 고다층(MLB) PCB. AI 데이터센터 증설 직결'},
+        {n:'삼성전기', code:'009150', tier:2, upd:'2026-05-10', d:'FC-BGA 등 고난도 패키지 기판. 아이폰17 기대감 교차 수혜'},
+        {n:'LG이노텍', code:'011070', tier:2, upd:'2026-05-10', d:'FC-BGA·반도체 기판 + AI 전장 부품 교차 수혜'},
+        {n:'기가비스', code:'435870', tier:3, upd:'2026-03-20', d:'PCB 검사 장비. 기판 난도 상승 수혜'},
       ]},
       {t:'데이터센터 전력', s:'AI의 연료', stocks:[
-        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, d:'초고압 변압기 북미 수출 주도. 데이터센터 전력망 대장주'},
-        {n:'지엔씨에너지', code:'119850', tier:1, x:true, d:'데이터센터 비상발전기 국내 점유율 70% 독점'},
-        {n:'산일전기', code:'062040', tier:2, d:'AI 데이터센터 변압기 수혜. \'26 실적 가시화 구간'},
+        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, upd:'2026-05-20', d:'초고압 변압기 북미 수출 주도. 데이터센터 전력망 대장주'},
+        {n:'지엔씨에너지', code:'119850', tier:1, x:true, upd:'2026-05-20', d:'데이터센터 비상발전기 국내 점유율 70% 독점'},
+        {n:'산일전기', code:'062040', tier:2, upd:'2026-04-15', d:'AI 데이터센터 변압기 수혜. \'26 실적 가시화 구간'},
       ]},
       {t:'소프트웨어·서비스', s:'국산 모델·인프라', stocks:[
-        {n:'네이버', code:'035420', tier:2, d:'국산 LLM 하이퍼클로바X 자체 개발. B2B AI 서비스 확장'},
-        {n:'카카오', code:'035720', tier:2, d:'국산 LLM·생성형 AI 서비스 + 밸류업 기대'},
-        {n:'삼성에스디에스', code:'018260', tier:2, d:'기업용 생성형 AI·클라우드·데이터센터 인프라'},
+        {n:'네이버', code:'035420', tier:2, upd:'2026-05-15', d:'국산 LLM 하이퍼클로바X 자체 개발. B2B AI 서비스 확장'},
+        {n:'카카오', code:'035720', tier:2, upd:'2026-05-15', d:'국산 LLM·생성형 AI 서비스 + 밸류업 기대'},
+        {n:'삼성에스디에스', code:'018260', tier:2, upd:'2026-04-20', d:'기업용 생성형 AI·클라우드·데이터센터 인프라'},
       ]},
     ]
   },
@@ -363,23 +445,23 @@ const DATA = [
     strength:{type:'pos', txt:'실적이 증명하는 수출 성장 + 무인전장 패러다임 전환 — 가장 현실적인 실적 동반'},
     stages:[
       {t:'체계종합·완성품', s:'무기 체계 최상단', stocks:[
-        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, d:'K9·레드백·천무 수출 주도. 수주잔고 25.3조(중동향 9.9조). 캐나다 9,200억 교체 사업 최강 후보'},
-        {n:'현대로템', code:'064350', tier:1, d:'\'25년 매출 5.7조·영업익 9,988억 사상 최대. 폴란드 K2 수출 + 중동 수출 모멘텀. 2026 P/E 23배로 방산주 중 저평가'},
-        {n:'한국항공우주(KAI)', code:'047810', tier:1, x:true, d:'KF-21 전투용 적합 판정 완료. FA-50·수리온 수출 + KF-21 양산 수혜'},
+        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, upd:'2026-05-28', d:'K9·레드백·천무 수출 주도. 수주잔고 25.3조(중동향 9.9조). 캐나다 9,200억 교체 사업 최강 후보'},
+        {n:'현대로템', code:'064350', tier:1, upd:'2026-05-28', d:'\'25년 매출 5.7조·영업익 9,988억 사상 최대. 폴란드 K2 수출 + 중동 수출 모멘텀. 2026 P/E 23배로 방산주 중 저평가'},
+        {n:'한국항공우주(KAI)', code:'047810', tier:1, x:true, upd:'2026-05-20', d:'KF-21 전투용 적합 판정 완료. FA-50·수리온 수출 + KF-21 양산 수혜'},
       ]},
       {t:'유도무기·미사일', s:'정밀 타격', stocks:[
-        {n:'LIG D&A', code:'079550', tier:1, d:'천궁·천무·현궁 등 유도무기 국내 선두. 중동 대규모 수주. 2026년 LIG넥스원에서 사명 변경(LIG 디펜스&에어로스페이스)'},
-        {n:'한화시스템', code:'272210', tier:2, d:'KF-21 AESA 레이더·항전시스템 핵심. UAM·드론봇 교차 수혜'},
+        {n:'LIG D&A', code:'079550', tier:1, upd:'2026-05-15', d:'천궁·천무·현궁 등 유도무기 국내 선두. 중동 대규모 수주. 2026년 LIG넥스원에서 사명 변경(LIG 디펜스&에어로스페이스)'},
+        {n:'한화시스템', code:'272210', tier:2, upd:'2026-05-10', d:'KF-21 AESA 레이더·항전시스템 핵심. UAM·드론봇 교차 수혜'},
       ]},
       {t:'무인체계·드론봇', s:'유무인복합(MUM-T)', stocks:[
-        {n:'현대로템', code:'064350', tier:1, x:true, d:'다목적무인차량 HR-셰르파 4세대. 자율주행·유무인복합전투 적용'},
-        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, d:'다목적무인차량 아리온스멧. 동유럽 무인전장 시장 공략'},
-        {n:'퍼스텍', code:'010820', tier:3, d:'군용 드론·UAV 부품·탑재체. RF머트리얼즈·RFHIC 동반 상승'},
-        {n:'켄코아에어로스페이스', code:'298060', tier:3, d:'항공·드론 복합소재 구조물 제조'},
+        {n:'현대로템', code:'064350', tier:1, x:true, upd:'2026-05-28', d:'다목적무인차량 HR-셰르파 4세대. 자율주행·유무인복합전투 적용'},
+        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, upd:'2026-05-28', d:'다목적무인차량 아리온스멧. 동유럽 무인전장 시장 공략'},
+        {n:'퍼스텍', code:'010820', tier:3, upd:'2026-03-10', d:'군용 드론·UAV 부품·탑재체. RF머트리얼즈·RFHIC 동반 상승'},
+        {n:'켄코아에어로스페이스', code:'298060', tier:3, upd:'2026-03-10', d:'항공·드론 복합소재 구조물 제조'},
       ]},
       {t:'탄약·화력지원', s:'소모성 전력', stocks:[
-        {n:'풍산', code:'103140', tier:2, d:'탄약 국내 독점 생산. 우크라이나 전쟁 장기화·중동 수요 급증'},
-        {n:'한화', code:'000880', tier:2, d:'방산 지주사 밸류업 정책 + 방산 자회사 실적 성장 시너지'},
+        {n:'풍산', code:'103140', tier:2, upd:'2026-05-01', d:'탄약 국내 독점 생산. 우크라이나 전쟁 장기화·중동 수요 급증'},
+        {n:'한화', code:'000880', tier:2, upd:'2026-04-20', d:'방산 지주사 밸류업 정책 + 방산 자회사 실적 성장 시너지'},
       ]},
     ]
   },
@@ -389,23 +471,23 @@ const DATA = [
     strength:{type:'pos', txt:'글로벌 인간형 로봇 공급망 편입 — 부품·감속기·센서 수혜 현실화 진입'},
     stages:[
       {t:'인간형 로봇 핵심 부품', s:'감속기·구동계', stocks:[
-        {n:'에스비비테크', code:'389030', tier:1, d:'정밀 감속기(하모닉드라이브) 국내 유일 양산. 인간형 로봇 핵심 부품'},
-        {n:'에스피지', code:'058110', tier:2, d:'소형 감속기·모터. 협동로봇·서비스로봇 수혜'},
-        {n:'삼익THK', code:'004380', tier:2, d:'리니어모션 가이드·볼스크류. 로봇 관절·이송 핵심'},
-        {n:'삼현', code:'064540', tier:2, d:'감속기 전문. 로봇 구동계 핵심 공급사로 부상'},
+        {n:'에스비비테크', code:'389030', tier:1, upd:'2026-05-25', d:'정밀 감속기(하모닉드라이브) 국내 유일 양산. 인간형 로봇 핵심 부품'},
+        {n:'에스피지', code:'058110', tier:2, upd:'2026-05-10', d:'소형 감속기·모터. 협동로봇·서비스로봇 수혜'},
+        {n:'삼익THK', code:'004380', tier:2, upd:'2026-04-15', d:'리니어모션 가이드·볼스크류. 로봇 관절·이송 핵심'},
+        {n:'삼현', code:'064540', tier:2, upd:'2026-04-15', d:'감속기 전문. 로봇 구동계 핵심 공급사로 부상'},
       ]},
       {t:'센서·비전', s:'인식·제어', stocks:[
-        {n:'로보티즈', code:'108490', tier:2, d:'서보 액추에이터 전문. 휴머노이드 관절 핵심 부품 공급'},
-        {n:'인텍플러스', code:'064290', tier:2, d:'3D 비전·AI 외관검사. 로봇 자동화 공정 확산 수혜'},
+        {n:'로보티즈', code:'108490', tier:2, upd:'2026-04-20', d:'서보 액추에이터 전문. 휴머노이드 관절 핵심 부품 공급'},
+        {n:'인텍플러스', code:'064290', tier:2, upd:'2026-04-10', d:'3D 비전·AI 외관검사. 로봇 자동화 공정 확산 수혜'},
       ]},
       {t:'협동로봇·서비스로봇', s:'완성품·시스템', stocks:[
-        {n:'레인보우로보틱스', code:'277810', tier:1, d:'국내 협동로봇 선두. 삼성전자 전략적 투자 유치 완료. 이족보행+차륜형 휴머노이드 개발'},
-        {n:'두산로보틱스', code:'454910', tier:2, d:'협동로봇 국내 2위. AI·휴머노이드 R&D 조직 강화. 5월 강세 흐름'},
-        {n:'휴림로봇', code:'090710', tier:3, d:'AI 자동화 기대감 수혜. 5월 12% 급등 포함 테마 편입'},
+        {n:'레인보우로보틱스', code:'277810', tier:1, upd:'2026-05-30', d:'국내 협동로봇 선두. 삼성전자 전략적 투자 유치 완료. 이족보행+차륜형 휴머노이드 개발'},
+        {n:'두산로보틱스', code:'454910', tier:2, upd:'2026-05-30', d:'협동로봇 국내 2위. AI·휴머노이드 R&D 조직 강화. 5월 강세 흐름'},
+        {n:'휴림로봇', code:'090710', tier:3, upd:'2026-05-20', d:'AI 자동화 기대감 수혜. 5월 12% 급등 포함 테마 편입'},
       ]},
       {t:'제어·소프트웨어', s:'로봇 OS·AI', stocks:[
-        {n:'로보스타', code:'090360', tier:2, d:'산업용 로봇 컨트롤러·소프트웨어 전문'},
-        {n:'현대무벡스', code:'043340', tier:3, d:'물류 자동화 로봇. AI 물류 자동화 수혜'},
+        {n:'로보스타', code:'090360', tier:2, upd:'2026-03-25', d:'산업용 로봇 컨트롤러·소프트웨어 전문'},
+        {n:'현대무벡스', code:'043340', tier:3, upd:'2026-03-25', d:'물류 자동화 로봇. AI 물류 자동화 수혜'},
       ]},
     ]
   },
@@ -415,21 +497,21 @@ const DATA = [
     strength:{type:'pos', txt:'이미 실적이 나오는 구간 — \'26 수주금액 원자력 5.8조+가스발전 5.3조=총 14.3조 전망'},
     stages:[
       {t:'주기기·SMR 원천', s:'밸류체인 최상단', stocks:[
-        {n:'두산에너빌리티', code:'034020', tier:1, d:'원전 주기기 국내 독점 + SMR 핵심 파운드리. \'25년 신규수주 14.7조 역대 최대. 목표주가 13만원(대신증권)'},
+        {n:'두산에너빌리티', code:'034020', tier:1, upd:'2026-05-25', d:'원전 주기기 국내 독점 + SMR 핵심 파운드리. \'25년 신규수주 14.7조 역대 최대. 목표주가 13만원(대신증권)'},
       ]},
       {t:'설계·엔지니어링', s:'EPC·설계', stocks:[
-        {n:'한전기술', code:'130660', tier:2, d:'원자로 계통·종합 설계 전문. 정부 신규원전 추진 발표 수혜. \'26.01 주가 강세'},
-        {n:'한국전력', code:'015760', tier:2, d:'원전 운영·전력 공급 인프라. 원전 정책 정상화 최대 수혜'},
+        {n:'한전기술', code:'130660', tier:2, upd:'2026-05-10', d:'원자로 계통·종합 설계 전문. 정부 신규원전 추진 발표 수혜. \'26.01 주가 강세'},
+        {n:'한국전력', code:'015760', tier:2, upd:'2026-05-10', d:'원전 운영·전력 공급 인프라. 원전 정책 정상화 최대 수혜'},
       ]},
       {t:'기자재·부품', s:'밸브·계측·정비', stocks:[
-        {n:'비에이치아이', code:'083650', tier:2, d:'원전 보조기기(BOP)·발전 기자재. 원전주 동반 강세 편입'},
-        {n:'한전KPS', code:'051600', tier:2, d:'원전 정비·운영 서비스. \'26 1분기 영업이익 370억(+374.6%)'},
-        {n:'우리기술', code:'032820', tier:3, d:'원전 계측제어·정비. 원전주 강세장 동반 상승'},
-        {n:'에너토크', code:'019770', tier:3, d:'밸브 구동장치(액추에이터). SMR 수주 확대 수혜'},
+        {n:'비에이치아이', code:'083650', tier:2, upd:'2026-04-20', d:'원전 보조기기(BOP)·발전 기자재. 원전주 동반 강세 편입'},
+        {n:'한전KPS', code:'051600', tier:2, upd:'2026-05-15', d:'원전 정비·운영 서비스. \'26 1분기 영업이익 370억(+374.6%)'},
+        {n:'우리기술', code:'032820', tier:3, upd:'2026-03-20', d:'원전 계측제어·정비. 원전주 강세장 동반 상승'},
+        {n:'에너토크', code:'019770', tier:3, upd:'2026-03-20', d:'밸브 구동장치(액추에이터). SMR 수주 확대 수혜'},
       ]},
       {t:'SMR 소재·단조', s:'압력용기·단조품', stocks:[
-        {n:'LS ELECTRIC', code:'010120', tier:2, x:true, d:'원전 전력 인프라. SMR 수혜 + 데이터센터 전력 교차 수혜'},
-        {n:'보성파워텍', code:'006910', tier:3, d:'원전 전력기기 부품. SMR 공급망 편입 기대'},
+        {n:'LS ELECTRIC', code:'010120', tier:2, x:true, upd:'2026-05-10', d:'원전 전력 인프라. SMR 수혜 + 데이터센터 전력 교차 수혜'},
+        {n:'보성파워텍', code:'006910', tier:3, upd:'2026-03-15', d:'원전 전력기기 부품. SMR 공급망 편입 기대'},
       ]},
     ]
   },
@@ -439,17 +521,17 @@ const DATA = [
     strength:{type:'pos', txt:'AI·원전·전기차 모든 테마의 공통 수혜 — 실적 동반. LS 영업익 1.5조 시대'},
     stages:[
       {t:'중전기기·변압기', s:'초고압 변압기 핵심', stocks:[
-        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, d:'초고압 변압기 북미 수출 주도. 전력기기 대장주. AI 데이터센터 전력망 수혜'},
-        {n:'LS ELECTRIC', code:'010120', tier:2, d:'전력기기·자동화. LS 영업이익 1.5조 시대 진입. 원전 교차 수혜'},
-        {n:'효성중공업', code:'298040', tier:2, x:true, d:'초고압 변압기 + 수소 충전 인프라 교차 수혜'},
-        {n:'산일전기', code:'062040', tier:2, d:'AI 데이터센터 변압기 수혜. \'26 실적 가시화 국면'},
+        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, upd:'2026-05-20', d:'초고압 변압기 북미 수출 주도. 전력기기 대장주. AI 데이터센터 전력망 수혜'},
+        {n:'LS ELECTRIC', code:'010120', tier:2, upd:'2026-05-10', d:'전력기기·자동화. LS 영업이익 1.5조 시대 진입. 원전 교차 수혜'},
+        {n:'효성중공업', code:'298040', tier:2, x:true, upd:'2026-04-25', d:'초고압 변압기 + 수소 충전 인프라 교차 수혜'},
+        {n:'산일전기', code:'062040', tier:2, upd:'2026-04-15', d:'AI 데이터센터 변압기 수혜. \'26 실적 가시화 국면'},
       ]},
       {t:'전선·케이블', s:'송배전', stocks:[
-        {n:'LS에코에너지', code:'229640', tier:2, d:'해저케이블·전력선. 신재생 연계 + 원전 인프라 수혜'},
-        {n:'대한전선', code:'001440', tier:3, d:'초고압 전선·케이블. 전력망 교체 수혜'},
+        {n:'LS에코에너지', code:'229640', tier:2, upd:'2026-04-20', d:'해저케이블·전력선. 신재생 연계 + 원전 인프라 수혜'},
+        {n:'대한전선', code:'001440', tier:3, upd:'2026-03-30', d:'초고압 전선·케이블. 전력망 교체 수혜'},
       ]},
       {t:'데이터센터 전원', s:'비상발전·UPS', stocks:[
-        {n:'지엔씨에너지', code:'119850', tier:1, x:true, d:'데이터센터 비상발전기 국내 점유율 70% 독보적 1위. AI 데이터센터 확장 직결'},
+        {n:'지엔씨에너지', code:'119850', tier:1, x:true, upd:'2026-05-20', d:'데이터센터 비상발전기 국내 점유율 70% 독보적 1위. AI 데이터센터 확장 직결'},
       ]},
     ]
   },
@@ -459,22 +541,22 @@ const DATA = [
     strength:{type:'warn', txt:'ESS 수요 반등·전고체 기대 vs 중국 가격 압박 병존 — 선별 접근 필요'},
     stages:[
       {t:'셀·배터리 완성품', s:'밸류체인 최상단', stocks:[
-        {n:'LG에너지솔루션', code:'373220', tier:1, d:'원통형·파우치 글로벌 2위. 북미 ESS 숏티지 최대 수혜. 소듐이온 배터리 \'26 파일럿 공개'},
-        {n:'삼성SDI', code:'006400', tier:1, d:'전고체 솔리드스택 샘플 공개(\'26 인터배터리). 프리미엄 EV + ESS LFP 공급 확대'},
-        {n:'SK온', code:'285130', tier:2, d:'황화물계 전고체 공개 + 고분자-산화물 복합계 2028년 양산 로드맵. 미국 공장 본격 가동'},
+        {n:'LG에너지솔루션', code:'373220', tier:1, upd:'2026-05-25', d:'원통형·파우치 글로벌 2위. 북미 ESS 숏티지 최대 수혜. 소듐이온 배터리 \'26 파일럿 공개'},
+        {n:'삼성SDI', code:'006400', tier:1, upd:'2026-05-25', d:'전고체 솔리드스택 샘플 공개(\'26 인터배터리). 프리미엄 EV + ESS LFP 공급 확대'},
+        {n:'SK온', code:'285130', tier:2, upd:'2026-05-20', d:'황화물계 전고체 공개 + 고분자-산화물 복합계 2028년 양산 로드맵. 미국 공장 본격 가동'},
       ]},
       {t:'전고체 소재', s:'차세대 배터리 핵심', stocks:[
-        {n:'에코프로비엠', code:'247540', tier:2, d:'양극재 국내 선두. 유럽 헝가리 현지 Capa 보유 — 비중국 밸류체인 배제 수혜'},
-        {n:'포스코퓨처엠', code:'003670', tier:2, d:'양극재+음극재 일관 생산. 비중국 음극재 정책 기조 강화 수혜'},
+        {n:'에코프로비엠', code:'247540', tier:2, upd:'2026-04-20', d:'양극재 국내 선두. 유럽 헝가리 현지 Capa 보유 — 비중국 밸류체인 배제 수혜'},
+        {n:'포스코퓨처엠', code:'003670', tier:2, upd:'2026-04-20', d:'양극재+음극재 일관 생산. 비중국 음극재 정책 기조 강화 수혜'},
       ]},
       {t:'전해질·분리막', s:'핵심 소재', stocks:[
-        {n:'솔브레인', code:'357780', tier:2, d:'전해질 국내 1위. 전고체 전해질 소재 개발 병행'},
-        {n:'더블유씨피(WCP)', code:'393890', tier:2, d:'분리막 글로벌 상위권. EV 배터리 수요 직결'},
-        {n:'롯데에너지머티리얼즈', code:'020150', tier:2, d:'동박 전문. IRA 정책 변화 + ESS 수혜 가능성'},
+        {n:'솔브레인', code:'357780', tier:2, upd:'2026-04-10', d:'전해질 국내 1위. 전고체 전해질 소재 개발 병행'},
+        {n:'더블유씨피(WCP)', code:'393890', tier:2, upd:'2026-04-10', d:'분리막 글로벌 상위권. EV 배터리 수요 직결'},
+        {n:'롯데에너지머티리얼즈', code:'020150', tier:2, upd:'2026-03-25', d:'동박 전문. IRA 정책 변화 + ESS 수혜 가능성'},
       ]},
       {t:'장비·후공정', s:'생산 장비', stocks:[
-        {n:'씨아이에스', code:'222080', tier:2, d:'전극 코팅 장비 전문. 셀 제조 필수 공정'},
-        {n:'피엔티', code:'137400', tier:3, d:'노칭·레이저 장비. 배터리 생산 라인 증설 수혜'},
+        {n:'씨아이에스', code:'222080', tier:2, upd:'2026-03-20', d:'전극 코팅 장비 전문. 셀 제조 필수 공정'},
+        {n:'피엔티', code:'137400', tier:3, upd:'2026-03-20', d:'노칭·레이저 장비. 배터리 생산 라인 증설 수혜'},
       ]},
     ]
   },
@@ -484,21 +566,21 @@ const DATA = [
     strength:{type:'warn', txt:'SDV·UAM은 아직 기대 단계 — 자율주행 부품·센서는 실적 가시화 진입'},
     stages:[
       {t:'완성차·플랫폼', s:'체계 최상단', stocks:[
-        {n:'현대차', code:'005380', tier:1, d:'SDV 전환 + UAM(슈퍼널) + 보스턴다이내믹스 보유'},
-        {n:'기아', code:'000270', tier:1, d:'PBV(목적기반차량) 플랫폼 글로벌 선두 도약 전략'},
+        {n:'현대차', code:'005380', tier:1, upd:'2026-05-15', d:'SDV 전환 + UAM(슈퍼널) + 보스턴다이내믹스 보유'},
+        {n:'기아', code:'000270', tier:1, upd:'2026-05-15', d:'PBV(목적기반차량) 플랫폼 글로벌 선두 도약 전략'},
       ]},
       {t:'자율주행 센서·SW', s:'인식·판단', stocks:[
-        {n:'모트렉스', code:'118990', tier:2, d:'차량용 인포테인먼트·디스플레이. SDV 전환 수혜'},
-        {n:'HL만도', code:'204320', tier:2, d:'조향·제동 자율주행 액추에이터 국내 1위'},
-        {n:'현대모비스', code:'012330', tier:2, d:'자율주행 모듈·ADAS·전동화 부품 통합 공급'},
+        {n:'모트렉스', code:'118990', tier:2, upd:'2026-04-10', d:'차량용 인포테인먼트·디스플레이. SDV 전환 수혜'},
+        {n:'HL만도', code:'204320', tier:2, upd:'2026-04-20', d:'조향·제동 자율주행 액추에이터 국내 1위'},
+        {n:'현대모비스', code:'012330', tier:2, upd:'2026-04-20', d:'자율주행 모듈·ADAS·전동화 부품 통합 공급'},
       ]},
       {t:'UAM·항공 모빌리티', s:'도심 항공', stocks:[
-        {n:'한화시스템', code:'272210', tier:2, x:true, d:'UAM 기체·통신·센서 수직통합. 국내 UAM 선두'},
-        {n:'KAI', code:'047810', tier:2, x:true, d:'UAM 기체 설계·인증. 군·민 항공 플랫폼 활용'},
+        {n:'한화시스템', code:'272210', tier:2, x:true, upd:'2026-05-10', d:'UAM 기체·통신·센서 수직통합. 국내 UAM 선두'},
+        {n:'KAI', code:'047810', tier:2, x:true, upd:'2026-05-20', d:'UAM 기체 설계·인증. 군·민 항공 플랫폼 활용'},
       ]},
       {t:'전장·반도체', s:'차량용 칩', stocks:[
-        {n:'현대오토에버', code:'307950', tier:2, d:'현대차그룹 차량 SW·클라우드·자율주행 플랫폼'},
-        {n:'텔레칩스', code:'054450', tier:3, d:'차량용 AP·인포테인먼트 반도체. SDV 수혜'},
+        {n:'현대오토에버', code:'307950', tier:2, upd:'2026-04-15', d:'현대차그룹 차량 SW·클라우드·자율주행 플랫폼'},
+        {n:'텔레칩스', code:'054450', tier:3, upd:'2026-03-20', d:'차량용 AP·인포테인먼트 반도체. SDV 수혜'},
       ]},
     ]
   },
@@ -508,16 +590,16 @@ const DATA = [
     strength:{type:'warn', txt:'장기 테마 — 실적보다 기대 선반영, 변동성 큼'},
     stages:[
       {t:'발사체·체계', s:'로켓·항공기', stocks:[
-        {n:'한화에어로스페이스', code:'012450', tier:1, d:'발사체 엔진·우주 사업 주관. 항공엔진 국내 독점'},
-        {n:'한국항공우주(KAI)', code:'047810', tier:1, d:'위성·항공기 체계종합. 누리호 체계 총조립'},
+        {n:'한화에어로스페이스', code:'012450', tier:1, upd:'2026-05-28', d:'발사체 엔진·우주 사업 주관. 항공엔진 국내 독점'},
+        {n:'한국항공우주(KAI)', code:'047810', tier:1, upd:'2026-05-20', d:'위성·항공기 체계종합. 누리호 체계 총조립'},
       ]},
       {t:'위성 본체·탑재체', s:'위성 제작', stocks:[
-        {n:'쎄트렉아이', code:'099320', tier:2, d:'국내 유일 상용 위성 본체 수출 기업'},
-        {n:'AP위성', code:'211270', tier:3, d:'위성통신 단말·본체 부품'},
+        {n:'쎄트렉아이', code:'099320', tier:2, upd:'2026-04-10', d:'국내 유일 상용 위성 본체 수출 기업'},
+        {n:'AP위성', code:'211270', tier:3, upd:'2026-03-15', d:'위성통신 단말·본체 부품'},
       ]},
       {t:'지상국·데이터', s:'관제·서비스', stocks:[
-        {n:'컨텍', code:'357390', tier:3, d:'위성 지상국 서비스(GSaaS) 전문'},
-        {n:'인텔리안테크', code:'189300', tier:2, d:'위성통신 안테나. 저궤도 위성망 수혜'},
+        {n:'컨텍', code:'357390', tier:3, upd:'2026-03-15', d:'위성 지상국 서비스(GSaaS) 전문'},
+        {n:'인텔리안테크', code:'189300', tier:2, upd:'2026-04-05', d:'위성통신 안테나. 저궤도 위성망 수혜'},
       ]},
     ]
   },
@@ -527,16 +609,16 @@ const DATA = [
     strength:{type:'warn', txt:'초기 단계 — 국내 순수 양자주는 적고 고변동. 신중 접근'},
     stages:[
       {t:'양자 컴퓨팅', s:'하드웨어·소자', stocks:[
-        {n:'아이씨티K(ICTK)', code:'456550', tier:3, d:'양자보안(PUF) 기반 하드웨어 보안칩'},
-        {n:'엑스게이트', code:'187420', tier:3, d:'양자암호통신(QKD) 네트워크 보안'},
+        {n:'아이씨티K(ICTK)', code:'456550', tier:3, upd:'2026-03-10', d:'양자보안(PUF) 기반 하드웨어 보안칩'},
+        {n:'엑스게이트', code:'187420', tier:3, upd:'2026-03-10', d:'양자암호통신(QKD) 네트워크 보안'},
       ]},
       {t:'양자 통신·센서', s:'암호·계측', stocks:[
-        {n:'우리로', code:'046120', tier:3, d:'단일광자 검출 등 양자광학 부품'},
-        {n:'케이씨에스', code:'115500', tier:3, d:'양자암호 통신장비'},
+        {n:'우리로', code:'046120', tier:3, upd:'2026-03-10', d:'단일광자 검출 등 양자광학 부품'},
+        {n:'케이씨에스', code:'115500', tier:3, upd:'2026-03-10', d:'양자암호 통신장비'},
       ]},
       {t:'연계 인프라', s:'통신·컴퓨팅', stocks:[
-        {n:'KT', code:'030200', tier:2, d:'양자암호통신망 상용화 주도(대형주, 양자는 일부 사업)'},
-        {n:'SK텔레콤', code:'017670', tier:2, d:'양자암호통신망 상용화 주도(대형주, 양자는 일부 사업)'},
+        {n:'KT', code:'030200', tier:2, upd:'2026-04-01', d:'양자암호통신망 상용화 주도(대형주, 양자는 일부 사업)'},
+        {n:'SK텔레콤', code:'017670', tier:2, upd:'2026-04-01', d:'양자암호통신망 상용화 주도(대형주, 양자는 일부 사업)'},
       ]},
     ]
   },
@@ -546,15 +628,15 @@ const DATA = [
     strength:{type:'warn', txt:'정책 의존도 높고 단기 수익성 약함 — 장기 관점 필요'},
     stages:[
       {t:'연료전지·발전', s:'수소 발전', stocks:[
-        {n:'두산퓨얼셀', code:'336260', tier:2, d:'수소연료전지 발전 국내 선두'},
-        {n:'범한퓨얼셀', code:'383220', tier:3, d:'잠수함·건물용 연료전지'},
+        {n:'두산퓨얼셀', code:'336260', tier:2, upd:'2026-04-15', d:'수소연료전지 발전 국내 선두'},
+        {n:'범한퓨얼셀', code:'383220', tier:3, upd:'2026-03-20', d:'잠수함·건물용 연료전지'},
       ]},
       {t:'생산·인프라', s:'생산·충전', stocks:[
-        {n:'효성중공업', code:'298040', tier:2, x:true, d:'수소 충전 인프라 + 액화수소'},
-        {n:'제이엔케이글로벌', code:'126880', tier:3, d:'수소 추출기(개질기) 전문'},
+        {n:'효성중공업', code:'298040', tier:2, x:true, upd:'2026-04-25', d:'수소 충전 인프라 + 액화수소'},
+        {n:'제이엔케이글로벌', code:'126880', tier:3, upd:'2026-03-15', d:'수소 추출기(개질기) 전문'},
       ]},
       {t:'탄소포집(CCU)', s:'탄소 저감', stocks:[
-        {n:'그린케미칼', code:'083420', tier:3, d:'이산화탄소 포집·전환 소재'},
+        {n:'그린케미칼', code:'083420', tier:3, upd:'2026-03-10', d:'이산화탄소 포집·전환 소재'},
       ]},
     ]
   },
@@ -564,17 +646,17 @@ const DATA = [
     strength:{type:'pos', txt:'CDMO·ADC·SC 플랫폼 기술은 글로벌 경쟁력 보유 — 실적 가시화 종목 선별 접근'},
     stages:[
       {t:'CDMO·생산', s:'위탁개발생산', stocks:[
-        {n:'삼성바이오로직스', code:'207940', tier:1, d:'바이오의약품 CDMO 글로벌 생산능력 1위. 5공장 가동으로 Capa 세계 최대 수준'},
-        {n:'삼성에피스홀딩스', code:'285130', tier:2, d:'삼성바이오에피스 모회사. 바이오시밀러 저평가 국면 탈출 주목'},
+        {n:'삼성바이오로직스', code:'207940', tier:1, upd:'2026-05-20', d:'바이오의약품 CDMO 글로벌 생산능력 1위. 5공장 가동으로 Capa 세계 최대 수준'},
+        {n:'삼성에피스홀딩스', code:'285130', tier:2, upd:'2026-05-10', d:'삼성바이오에피스 모회사. 바이오시밀러 저평가 국면 탈출 주목'},
       ]},
       {t:'바이오시밀러·신약', s:'개발·판매', stocks:[
-        {n:'셀트리온', code:'068270', tier:1, d:'바이오시밀러 글로벌 선두권. 자체 개발·생산·판매 일관체계'},
-        {n:'유한양행', code:'000100', tier:2, d:'폐암 신약 렉라자 美 FDA 승인 후 글로벌 매출 본격화'},
+        {n:'셀트리온', code:'068270', tier:1, upd:'2026-05-15', d:'바이오시밀러 글로벌 선두권. 자체 개발·생산·판매 일관체계'},
+        {n:'유한양행', code:'000100', tier:2, upd:'2026-05-10', d:'폐암 신약 렉라자 美 FDA 승인 후 글로벌 매출 본격화'},
       ]},
       {t:'플랫폼 기술', s:'원천 기술', stocks:[
-        {n:'알테오젠', code:'196170', tier:1, d:'피하주사 제형 변환(SC) 플랫폼 글로벌 빅파마 라이선스 계약 지속'},
-        {n:'리가켐바이오', code:'141080', tier:2, d:'항체약물접합체(ADC) 플랫폼 기술수출 확대'},
-        {n:'오스코텍', code:'039200', tier:3, d:'키나제 억제제 기반 신약 파이프라인. 기술수출 기대'},
+        {n:'알테오젠', code:'196170', tier:1, upd:'2026-05-20', d:'피하주사 제형 변환(SC) 플랫폼 글로벌 빅파마 라이선스 계약 지속'},
+        {n:'리가켐바이오', code:'141080', tier:2, upd:'2026-05-10', d:'항체약물접합체(ADC) 플랫폼 기술수출 확대'},
+        {n:'오스코텍', code:'039200', tier:3, upd:'2026-04-01', d:'키나제 억제제 기반 신약 파이프라인. 기술수출 기대'},
       ]},
     ]
   },
@@ -603,6 +685,45 @@ function xmarkHTML(st){
   return st.x ? `<span class="xmark">${esc('교차')}</span>` : '';
 }
 
+// ── 업데이트 날짜 표시 헬퍼 ──
+function updDateHTML(upd){
+  if(!upd) return '';
+  const d = new Date(upd);
+  const now = new Date('2026-05-30');
+  const diffDays = Math.floor((now - d) / 86400000);
+  const cls = diffDays <= 30 ? 'recent' : 'old';
+  const label = diffDays === 0 ? '오늘' : diffDays <= 7 ? `${diffDays}일 전` : upd.replace(/^2026-/, '');
+  return `<div class="stock-date ${cls}"><span class="stock-date-dot"></span>업데이트 ${esc(label)}</div>`;
+}
+
+// ── 티어 분포 차트 HTML ──
+function tierChartHTML(d){
+  const allStocks = d.stages.flatMap(s => s.stocks);
+  const t1 = allStocks.filter(s => Number(s.tier) === 1).length;
+  const t2 = allStocks.filter(s => Number(s.tier) === 2).length;
+  const t3 = allStocks.filter(s => Number(s.tier) === 3).length;
+  const total = allStocks.length;
+  const pct = n => total > 0 ? Math.round(n / total * 100) : 0;
+  return `<div class="tier-chart">
+    <div class="tier-chart-label">📊 티어 분포 · 총 ${total}종목</div>
+    <div class="tier-bar-row">
+      <span class="tier-bar-name">독보</span>
+      <div class="tier-bar-track"><div class="tier-bar-fill t1" style="width:${pct(t1)}%"></div></div>
+      <span class="tier-bar-count t1">${t1}<span style="font-size:11px;font-weight:700;opacity:.8">종</span></span>
+    </div>
+    <div class="tier-bar-row">
+      <span class="tier-bar-name">선두</span>
+      <div class="tier-bar-track"><div class="tier-bar-fill t2" style="width:${pct(t2)}%"></div></div>
+      <span class="tier-bar-count t2">${t2}<span style="font-size:11px;font-weight:700;opacity:.8">종</span></span>
+    </div>
+    <div class="tier-bar-row">
+      <span class="tier-bar-name">성장</span>
+      <div class="tier-bar-track"><div class="tier-bar-fill t3" style="width:${pct(t3)}%"></div></div>
+      <span class="tier-bar-count t3">${t3}<span style="font-size:11px;font-weight:700;opacity:.8">종</span></span>
+    </div>
+  </div>`;
+}
+
 function panelHTML(d){
   const isPos = d.strength.type === 'pos';
   const parts = [];
@@ -612,17 +733,23 @@ function panelHTML(d){
     <div class="strength ${isPos ? 'pos' : 'warn'}">
       <span>${isPos ? '✅' : '⚠️'}</span><span>${esc(d.strength.txt)}</span>
     </div>
+    ${tierChartHTML(d)}
   </div>`);
 
   d.stages.forEach((s, si) => {
-    const cards = s.stocks.map(st => {
+    const sorted = [...s.stocks].sort((a, b) => Number(a.tier) - Number(b.tier));
+    // 스테이지 내 첫 번째 tier1 종목 인덱스
+    const firstT1idx = sorted.findIndex(st => Number(st.tier) === 1);
+    const cards = sorted.map((st, cardIdx) => {
+      const isKey = cardIdx === firstT1idx && firstT1idx !== -1;
       return `
-      <div class="stock" data-name="${esc(st.n)}" data-code="${esc(st.code||'')}">
+      <div class="stock${isKey ? ' stock-key' : ''}" data-name="${esc(st.n)}" data-code="${esc(st.code||'')}">
         <div class="stock-top">
           <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+st.code+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
-          <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
+          <span style="display:flex;align-items:center;gap:4px">${isKey ? '<span class="key-badge">★ 핵심</span>' : ''}${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
         <div class="stock-desc">${esc(st.d)}</div>
+        ${updDateHTML(st.upd)}
       </div>`;
     }).join('');
     parts.push(`<div class="stage">
@@ -687,6 +814,14 @@ function show(idx, focusTab) {
 
   document.getElementById('fav-panel').classList.remove('vis');
   document.getElementById('content').classList.remove('hidden');
+  const crossPanel = document.getElementById('cross-panel');
+  if(crossPanel) crossPanel.classList.remove('vis');
+  const crossTab = document.getElementById('tab-cross');
+  if(crossTab) crossTab.classList.remove('on');
+  const favTab2 = document.getElementById('tab-fav');
+  if(favTab2) favTab2.classList.remove('on');
+  const legend = document.getElementById('legend');
+  if(legend) legend.style.display = '';
   panels.forEach((p, i) => {
     const on = i === idx;
     p.classList.toggle('hidden', !on);
@@ -790,10 +925,9 @@ function favCardHTML(st, tabName, stageName){
       <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn ${isFav?'on':''}" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">${isFav?'★':'☆'}</button></span>
     </div>
     <div class="stock-desc">${esc(st.d)}</div>
+    ${updDateHTML(st.upd)}
   </div>`;
 }
-
-// favs 순서 기준으로 종목 데이터 매핑
 function getFavStocks(){
   const map = {};
   DATA.forEach(d => {
@@ -838,6 +972,7 @@ function renderFavPanel(){
           <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn on" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">★</button></span>
         </div>
         <div class="stock-desc">${esc(st.d)}</div>
+        ${updDateHTML(st.upd)}
         ${footer}
       </div>
     </div>`;
@@ -870,12 +1005,18 @@ function deactivateAll(){
   const favTab = document.getElementById('tab-fav');
   if(favTab) favTab.classList.remove('on');
   document.getElementById('fav-panel').classList.remove('vis');
+  const crossTab = document.getElementById('tab-cross');
+  if(crossTab) crossTab.classList.remove('on');
+  const crossPanel = document.getElementById('cross-panel');
+  if(crossPanel) crossPanel.classList.remove('vis');
 }
 
 function showFavPanel(){
   deactivateAll();
   document.getElementById('tab-fav').classList.add('on');
   document.getElementById('content').classList.add('hidden');
+  const legend = document.getElementById('legend');
+  if(legend) legend.style.display = 'none';
   current = -2;
   document.getElementById('fav-panel').classList.add('vis');
   renderFavPanel();
@@ -887,6 +1028,97 @@ function showFavPanel(){
 if(location.hash === '#fav') showFavPanel();
 syncAllFavBtns();
 updateFavTab();
+
+// ══════════════════════════════════════
+// 교차 종목 모아보기
+// ══════════════════════════════════════
+function getCrossStocks(){
+  const result = [];
+  DATA.forEach(d => {
+    d.stages.forEach(s => {
+      s.stocks.forEach(st => {
+        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon});
+      });
+    });
+  });
+  return result;
+}
+
+function renderCrossPanel(){
+  const panel = document.getElementById('cross-panel');
+  if(!panel.classList.contains('vis')) return;
+  const list = getCrossStocks();
+  if(list.length === 0){
+    panel.innerHTML = '<div class="fav-empty">교차 종목이 없습니다.</div>';
+    return;
+  }
+  // 탭별 그룹핑
+  const groups = {};
+  list.forEach(({st, tabName, stageName, tabIcon}) => {
+    const key = tabName;
+    if(!groups[key]) groups[key] = {tabName, tabIcon, items:[]};
+    groups[key].items.push({st, stageName});
+  });
+  let html = '';
+  Object.values(groups).forEach(g => {
+    const sortedItems = [...g.items].sort((a, b) => Number(a.st.tier) - Number(b.st.tier));
+    html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${g.items.length}종목</div>`;
+    html += '<div class="grid" style="margin-bottom:14px">';
+    sortedItems.forEach(({st, stageName}) => {
+      const isFav = favs.includes(st.n);
+      html += `<div class="search-result-item">
+        <div class="search-result-meta">
+          <span class="tab-badge">${esc(g.tabName)}</span>
+          <span class="stage-badge">${esc(stageName)}</span>
+        </div>
+        <div class="stock-top">
+          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+st.code+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
+          <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn ${isFav?'on':''}" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">${isFav?'★':'☆'}</button></span>
+        </div>
+        <div class="stock-desc">${esc(st.d)}</div>
+        ${updDateHTML(st.upd)}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  panel.innerHTML = html;
+  syncAllFavBtns();
+}
+
+function showCrossPanel(){
+  deactivateAll();
+  const crossTab = document.getElementById('tab-cross');
+  if(crossTab) crossTab.classList.add('on');
+  document.getElementById('content').classList.add('hidden');
+  const legend = document.getElementById('legend');
+  if(legend) legend.style.display = 'none';
+  document.getElementById('fav-panel').classList.remove('vis');
+  current = -3;
+  document.getElementById('cross-panel').classList.add('vis');
+  renderCrossPanel();
+  window.scrollTo({top:0, behavior:'instant'});
+  try{ history.replaceState(null,'','#cross'); }catch(e){}
+}
+
+// 교차 탭 버튼 추가 — 관심종목 탭 뒤에 삽입
+(function addCrossTab(){
+  const crossCount = DATA.reduce((a, d) =>
+    a + d.stages.reduce((b, s) => b + s.stocks.filter(st => st.x).length, 0), 0);
+  const b = document.createElement('button');
+  b.className = 'nav-tab cross-tab';
+  b.id = 'tab-cross';
+  b.type = 'button';
+  b.setAttribute('role', 'tab');
+  b.setAttribute('aria-selected', 'false');
+  b.innerHTML = `<span>🔀 교차종목</span><span class="cnt">${crossCount}</span>`;
+  b.onclick = () => showCrossPanel();
+  const favTab = document.getElementById('tab-fav');
+  if(favTab && favTab.nextSibling) nav.insertBefore(b, favTab.nextSibling);
+  else nav.appendChild(b);
+})();
+
+// 해시 #cross 초기 처리
+if(location.hash === '#cross') showCrossPanel();
 
 // fixed 헤더 높이만큼 본문 상단 여백 자동 적용
 function applyHeaderOffset() {
