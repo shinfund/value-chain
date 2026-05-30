@@ -147,18 +147,7 @@ body{
 .lead.t1{background:var(--coral50); color:var(--coral800)}
 .lead.t2{background:var(--sky50); color:var(--sky800)}
 .lead.t3{background:var(--gray50); color:var(--gray600)}
-.stock-desc{font-size:13.5px; color:var(--txt); margin-top:7px; line-height:1.7; font-weight:400; letter-spacing:-.01em}
-.stock-price-row{display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap;}
-.stock-price{font-size:14px; font-weight:800; color:var(--txt); letter-spacing:-.02em;}
-.stock-price.up{color:#e03131;}
-.stock-price.dn{color:#1971c2;}
-.stock-chg{font-size:11.5px; font-weight:700; padding:1px 6px; border-radius:8px;}
-.stock-chg.up{background:#fff0f0; color:#e03131;}
-.stock-chg.dn{background:#e8f4fd; color:#1971c2;}
-.stock-chg.flat{background:var(--gray50); color:var(--gray600);}
-.stock-price-time{font-size:10px; color:var(--txt2); margin-left:auto;}
-.stock-price-skeleton{height:18px; width:80px; background:linear-gradient(90deg,var(--border) 25%,var(--bg) 50%,var(--border) 75%); background-size:200% 100%; animation:shimmer 1.2s infinite; border-radius:6px; margin-top:7px;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.stock-desc{font-size:13.5px; color:var(--txt); margin-top:7px; line-height:1.7; font-weight:400; letter-spacing:-.01em}100%{background-position:-200% 0}}
 
 /* 범례 */
 .legend{
@@ -634,7 +623,6 @@ function panelHTML(d){
           <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
         <div class="stock-desc">${esc(st.d)}</div>
-        ${st.code ? `<div class="stock-price-skeleton" id="price-${esc(st.code)}"></div>` : ''}
       </div>`;
     }).join('');
     parts.push(`<div class="stage">
@@ -850,7 +838,6 @@ function renderFavPanel(){
           <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn on" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">★</button></span>
         </div>
         <div class="stock-desc">${esc(st.d)}</div>
-        ${st.code ? `<div class="stock-price-skeleton" id="price-${esc(st.code)}"></div>` : ''}
         ${footer}
       </div>
     </div>`;
@@ -937,108 +924,6 @@ function navScroll(dir){
 navEl.addEventListener('scroll', updateNavArrows);
 updateNavArrows();
 
-// ── 주가 실시간(지연 15~20분) 로딩 ──
-// 코스닥 종목코드 목록 (Yahoo Finance에서 .KQ suffix 사용)
-const KOSDAQ_CODES = new Set([
-  '399720','394280','054450','042700','095340','363140','435870',
-  '119850','062040','035420','035720','454910','277810','064540',
-  '058110','108490','090360','090710','130660','247540','393890',
-  '222080','137400','189300','357390','383220','083420','196170',
-  '141080','039200','064290','389030','456550','187420','115500',
-  '046120','099320','211270','298060','357780','272210','043340',
-  '083650','229640','126880','010820','298060','064290'
-]);
-
-const priceCache = {};  // code → {price, chg, chgPct, time}
-const pendingCodes = new Set();
-
-function yahooSymbol(code) {
-  return code + (KOSDAQ_CODES.has(code) ? '.KQ' : '.KS');
-}
-
-function fmt(n) {
-  return Number(n).toLocaleString('ko-KR');
-}
-
-function renderPrice(code, data) {
-  const els = document.querySelectorAll(`#price-${code}`);
-  els.forEach(el => {
-    if (!el) return;
-    const chgPct = data.chgPct;
-    const dir = chgPct > 0 ? 'up' : chgPct < 0 ? 'dn' : 'flat';
-    const sign = chgPct > 0 ? '+' : '';
-    const chgStr = `${sign}${data.chg >= 0 ? '+' : ''}${fmt(Math.round(data.chg))} (${sign}${chgPct.toFixed(2)}%)`;
-    el.outerHTML = `<div class="stock-price-row" id="price-${code}">
-      <span class="stock-price ${dir}">${fmt(Math.round(data.price))}원</span>
-      <span class="stock-chg ${dir}">${chgStr}</span>
-      <span class="stock-price-time">지연 · ${data.time}</span>
-    </div>`;
-  });
-}
-
-async function fetchPrices(codes) {
-  // Yahoo Finance는 최대 10개씩 batch 가능
-  const unique = [...new Set(codes)].filter(c => c && !priceCache[c]);
-  if (!unique.length) return;
-
-  const batches = [];
-  for (let i = 0; i < unique.length; i += 10) batches.push(unique.slice(i, i + 10));
-
-  for (const batch of batches) {
-    const symbols = batch.map(yahooSymbol).join(',');
-    try {
-      const yUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime`;
-      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yUrl)}`);
-      if (!res.ok) continue;
-      const wrapper = await res.json();
-      const json = JSON.parse(wrapper.contents);
-      const quotes = json?.quoteResponse?.result || [];
-      quotes.forEach(q => {
-        const code = q.symbol.replace(/\.(KS|KQ)$/, '');
-        const d = new Date(q.regularMarketTime * 1000);
-        const time = d.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
-        const data = {
-          price: q.regularMarketPrice,
-          chg: q.regularMarketChange,
-          chgPct: q.regularMarketChangePercent,
-          time
-        };
-        priceCache[code] = data;
-        renderPrice(code, data);
-      });
-    } catch(e) {
-      // 실패 시 skeleton 제거
-      batch.forEach(code => {
-        document.querySelectorAll(`#price-${code}`).forEach(el => el.remove());
-      });
-    }
-  }
-}
-
-// 탭 전환 시 현재 패널의 종목 가격 로드
-function loadPanelPrices(panelEl) {
-  if (!panelEl) return;
-  const codes = [...panelEl.querySelectorAll('[data-code]')]
-    .map(el => el.dataset.code).filter(Boolean);
-  // 캐시된 것은 바로 렌더, 없는 것은 fetch
-  const cached = codes.filter(c => priceCache[c]);
-  const toFetch = codes.filter(c => !priceCache[c]);
-  cached.forEach(c => renderPrice(c, priceCache[c]));
-  if (toFetch.length) fetchPrices(toFetch);
-}
-
-// show() 함수 패치 — 탭 전환 시 가격 로드 트리거
-const _origShow = show;
-window.show = function(idx) {
-  _origShow(idx);
-  setTimeout(() => {
-    const panel = panels[idx];
-    if (panel) loadPanelPrices(panel);
-  }, 50);
-};
-
-// 초기 로드: 첫 번째 탭 가격 로드
-setTimeout(() => loadPanelPrices(panels[0]), 300);
 </script>
 </body>
 </html>
