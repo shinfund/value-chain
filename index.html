@@ -988,9 +988,10 @@ async function fetchPrices(codes) {
     const symbols = batch.map(yahooSymbol).join(',');
     try {
       const yUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime`;
-      const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(yUrl)}`);
+      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yUrl)}`);
       if (!res.ok) continue;
-      const json = await res.json();
+      const wrapper = await res.json();
+      const json = JSON.parse(wrapper.contents);
       const quotes = json?.quoteResponse?.result || [];
       quotes.forEach(q => {
         const code = q.symbol.replace(/\.(KS|KQ)$/, '');
