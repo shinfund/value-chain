@@ -1170,16 +1170,7 @@ function showFromHome(idx){
   }
 }
 
-// 초기 진입: home 해시이거나 해시 없으면 홈 그리드 표시
-// #fav·#cross는 하단 즐겨찾기·교차 초기화 코드에서 각각 처리
-const initHash = location.hash.slice(1);
-if(!initHash || initHash === 'home'){
-  showHomePanel();
-} else if(initHash !== 'fav' && initHash !== 'cross'){
-  const initIdx = DATA.findIndex(d => d.key === initHash);
-  if(initIdx >= 0) show(initIdx);
-  else showHomePanel(); // 알 수 없는 해시 → 홈
-}
+// 초기 진입 처리는 홈 탭 버튼 추가 이후(addHomeTab 실행 후)로 이동
 
 
 // ══════════════════════════════════════
@@ -1415,6 +1406,19 @@ function showCrossPanel(){
 
 // 해시 #cross 초기 처리
 if(location.hash === '#cross') showCrossPanel();
+
+// ── 초기 진입: 모든 탭 삽입 완료 후 실행 ──
+// (홈 탭 버튼이 DOM에 추가된 뒤 실행해야 tab-home 활성화 가능)
+(function initPage(){
+  const h = location.hash.slice(1);
+  if(!h || h === 'home'){
+    showHomePanel();
+  } else if(h !== 'fav' && h !== 'cross'){
+    const i = DATA.findIndex(d => d.key === h);
+    if(i >= 0) show(i);
+    else showHomePanel();
+  }
+})();
 
 // fixed 헤더 높이만큼 본문 상단 여백 자동 적용
 function applyHeaderOffset() {
