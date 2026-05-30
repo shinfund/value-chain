@@ -1407,17 +1407,11 @@ function showCrossPanel(){
 // 해시 #cross 초기 처리
 if(location.hash === '#cross') showCrossPanel();
 
-// ── 초기 진입: 모든 탭 삽입 완료 후 실행 ──
-// (홈 탭 버튼이 DOM에 추가된 뒤 실행해야 tab-home 활성화 가능)
+// ── 초기 진입: 항상 홈 그리드로 시작 ──
+// 브라우저 캐시·이전 해시 잔류 방지를 위해 무조건 홈으로 초기화
 (function initPage(){
-  const h = location.hash.slice(1);
-  if(!h || h === 'home'){
-    showHomePanel();
-  } else if(h !== 'fav' && h !== 'cross'){
-    const i = DATA.findIndex(d => d.key === h);
-    if(i >= 0) show(i);
-    else showHomePanel();
-  }
+  try { history.replaceState(null, '', location.pathname + '#home'); } catch(e){}
+  showHomePanel();
 })();
 
 // fixed 헤더 높이만큼 본문 상단 여백 자동 적용
