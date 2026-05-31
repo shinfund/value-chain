@@ -115,9 +115,10 @@ body{
   flex-shrink:0; width:30px; height:30px; border-radius:9px;
   background:var(--sky); color:#fff; font-weight:900; font-size:14px;
   display:flex; align-items:center; justify-content:center;
+  align-self:center;
 }
-.stage-title{font-size:15.5px; font-weight:800}
-.stage-sub{font-size:11.5px; color:var(--txt3); font-weight:500; margin-top:1px}
+.stage-title{font-size:15.5px; font-weight:800; line-height:1.3;}
+.stage-sub{font-size:12px; color:var(--txt2); font-weight:600; margin-top:2px; letter-spacing:-.01em;}
 /* 종목 카드 그리드 */
 .grid{display:grid; grid-template-columns:1fr; gap:9px}
 @media(min-width:560px){.grid{grid-template-columns:1fr 1fr}}
@@ -131,8 +132,8 @@ body{
 }
 .stock:hover{transform:translateY(-2px); box-shadow:var(--shadow-hover)}
 .stock-top{display:flex; align-items:center; justify-content:space-between; gap:6px}
-.stock-name{font-size:14.5px; font-weight:800; color:var(--txt); display:flex; align-items:center; gap:6px}
-.stock-link{text-decoration:none; color:var(--txt); cursor:pointer; display:flex; align-items:center; gap:6px;}
+.stock-name{font-size:14.5px; font-weight:800; color:var(--txt); display:flex; align-items:center; gap:5px}
+.stock-link{text-decoration:none; color:var(--txt); cursor:pointer;}
 .stock-link:hover .stock-link-icon{opacity:1;}
 .stock-link:hover{color:var(--sky600);}
 .stock-link-icon{font-size:11px; color:var(--sky600); opacity:0.45; transition:opacity .15s; flex-shrink:0;}
@@ -156,31 +157,6 @@ body{
   font-size:12px; line-height:1.65; font-weight:500;
 }
 .disc b{font-weight:800}
-
-/* ── 종목 로고 ── */
-.stock-logo{
-  flex-shrink:0; width:28px; height:28px; border-radius:7px;
-  overflow:hidden; display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:800; letter-spacing:-.03em;
-  border:1px solid var(--border);
-}
-.stock-logo img{
-  width:28px; height:28px; object-fit:contain; display:block;
-}
-.stock-logo.fallback{
-  background:var(--sky50); color:var(--sky800); border-color:var(--sky100);
-}
-.stock-logo.cl-ai{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4;}
-.stock-logo.cl-defense{background:#FAEEDA;color:#633806;border-color:#f5d8a0;}
-.stock-logo.cl-robot{background:#EAF3DE;color:#27500A;border-color:#c5e0a0;}
-.stock-logo.cl-nuke{background:#EEEDFE;color:#3C3489;border-color:#c5c2f8;}
-.stock-logo.cl-power{background:#FAECE7;color:#712B13;border-color:#f0c0ae;}
-.stock-logo.cl-battery{background:#E1F5EE;color:#085041;border-color:#a0ddc8;}
-.stock-logo.cl-mobility{background:#fdf0e6;color:#7a3b00;border-color:#f5c896;}
-.stock-logo.cl-space{background:#f0eafc;color:#4a2080;border-color:#c8aaf0;}
-.stock-logo.cl-quantum{background:#e6f9f5;color:#0a5c50;border-color:#90ddd0;}
-.stock-logo.cl-hydro{background:#e6f4fb;color:#0a4a6e;border-color:#90cce8;}
-.stock-logo.cl-bio{background:#fce8f0;color:#6e0a30;border-color:#e8a0c0;}
 
 /* ── 교차 종목 탭 ── */
 .nav-tab.cross-tab{color:var(--purple800);}
@@ -243,25 +219,25 @@ body{
 
 /* ── 업데이트 날짜 ── */
 .stock-date{
-  font-size:10.5px; color:var(--txt3); font-weight:500;
-  margin-top:5px; display:flex; align-items:center; gap:4px;
+  font-size:12px; color:var(--txt2); font-weight:600;
+  margin-top:6px; display:flex; align-items:center; gap:5px;
 }
 .stock-date-dot{
-  width:5px; height:5px; border-radius:50%; background:var(--teal); opacity:.7; flex-shrink:0;
+  width:6px; height:6px; border-radius:50%; background:var(--teal); opacity:.8; flex-shrink:0;
 }
 .stock-date.recent .stock-date-dot{background:var(--teal); opacity:1;}
-.stock-date.old .stock-date-dot{background:var(--gray600); opacity:.5;}
+.stock-date.old .stock-date-dot{background:var(--gray600); opacity:.6;}
 
 /* ── 이력 보기 버튼 ── */
 .hist-btn{
   margin-left:auto; border:none; background:transparent; cursor:pointer;
-  font-size:10px; color:var(--txt3); font-weight:600; padding:0 2px;
+  font-size:11.5px; color:var(--sky600); font-weight:700; padding:2px 6px;
   -webkit-tap-highlight-color:transparent; line-height:1;
-  display:flex; align-items:center; gap:2px; transition:color .15s;
-  white-space:nowrap;
+  display:flex; align-items:center; gap:3px; transition:color .15s;
+  white-space:nowrap; background:var(--sky50); border-radius:20px;
 }
-.hist-btn:hover{color:var(--sky600);}
-.hist-btn .hist-arrow{font-size:9px; transition:transform .2s; display:inline-block;}
+.hist-btn:hover{color:var(--sky800); background:var(--sky100);}
+.hist-btn .hist-arrow{font-size:10px; transition:transform .2s; display:inline-block;}
 .hist-btn.open .hist-arrow{transform:rotate(180deg);}
 
 /* ── 이력 드롭다운 ── */
@@ -1041,27 +1017,8 @@ const DATA = [
 
 const nav = document.getElementById('nav');
 const content = document.getElementById('content');
-
-// ── 종목 로고 헬퍼 ──
-// code 있으면 네이버 증권 img 시도 → onerror 시 이니셜 배지로 폴백
-function stockLogoHTML(st, sectorKey){
-  const initials = st.n.replace(/[^가-힣A-Za-z0-9]/g,'').slice(0,2) || '?';
-  const cl = 'cl-' + (sectorKey||'');
-  if(st.code){
-    const src = `https://ssl.pstatic.net/imgstock/company/ico/${esc(st.code)}.gif`;
-    // onerror: img 제거 후 span에 이니셜 텍스트노드를 appendChild로 안전하게 삽입
-    const onErr = `(function(img){
-      var p=img.parentNode; if(!p) return;
-      p.classList.add('fallback'); p.classList.add('${cl}');
-      img.parentNode.removeChild(img);
-      p.appendChild(document.createTextNode('${initials}'));
-    })(this)`;
-    return `<span class="stock-logo" id="logo-${esc(st.code)}">` +
-      `<img src="${src}" alt="${esc(st.n)}" onerror="${onErr.replace(/\n\s*/g,' ')}">` +
-      `</span>`;
-  }
-  return `<span class="stock-logo fallback ${cl}">${initials}</span>`;
-}
+// key → sector 객체 Map (applyHomeTierFilter O(1) 조회용)
+const DATA_MAP = new Map(DATA.map(d => [d.key, d]));
 
 // XSS 방지: innerHTML 주입 전 이스케이프
 function esc(v){
@@ -1089,11 +1046,14 @@ function countStocks(d){
 }
 
 // ── [r2] 날짜 diff → 표시 label 공통 헬퍼 ──
+// diff(일수)와 label(표시 텍스트)을 함께 반환 — updDateHTML·renderHomePanel 공용
 function dayDiffLabel(upd){
   const diff = Math.floor((new Date() - new Date(upd)) / 86400000);
-  if(diff === 0) return '오늘';
-  if(diff <= 7) return `${diff}일 전`;
-  return upd.replace(/^\d{4}-(\d{2})-(\d{2})$/, (_, m, d) => m + '/' + d);
+  let label;
+  if(diff === 0) label = '오늘';
+  else if(diff <= 7) label = `${diff}일 전`;
+  else label = upd.replace(/^\d{4}-(\d{2})-(\d{2})$/, (_, m, d) => m + '/' + d);
+  return {diff, label};
 }
 
 // ── [r1] 리스크 파싱 공통 헬퍼 ──
@@ -1110,9 +1070,8 @@ function splitRisk(escaped, riskSpanClass){
 // ── 업데이트 날짜 표시 헬퍼 ──
 function updDateHTML(upd, hist, uid){
   if(!upd) return '';
-  const diffDays = Math.floor((new Date() - new Date(upd)) / 86400000);
+  const {diff: diffDays, label} = dayDiffLabel(upd);
   const cls = diffDays <= 30 ? 'recent' : 'old';
-  const label = dayDiffLabel(upd);
   const hasHist = hist && hist.length > 0;
   const histBtn = hasHist
     ? `<button class="hist-btn" id="hbtn-${uid}" onclick="toggleHist('${uid}')" aria-expanded="false">이력 ${hist.length}건 <span class="hist-arrow">▼</span></button>`
@@ -1124,7 +1083,7 @@ function updDateHTML(upd, hist, uid){
 // ── 이력 HTML 생성 ──
 function buildHistHTML(hist){
   const items = hist.map((h, i) => {
-    const label = dayDiffLabel(h.upd);
+    const {label} = dayDiffLabel(h.upd);
     const isLatest = i === 0;
     const body = splitRisk(esc(h.d), 'hist-risk');
     return `<div class="hist-item"><span class="hist-date${isLatest?' hl':''}">${esc(label)}</span><span class="hist-body">${body}</span></div>`;
@@ -1198,7 +1157,7 @@ function panelHTML(d){
       return `
       <div class="stock${isKey ? ' stock-key' : ''}" data-name="${esc(st.n)}" data-code="${esc(st.code||'')}">
         <div class="stock-top">
-          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${stockLogoHTML(st, d.key)}${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
+          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
           <span style="display:flex;align-items:center;gap:4px">${isKey ? '<span class="key-badge">★ 핵심</span>' : ''}${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
         <div class="stock-desc">${splitRisk(esc(st.d), 'risk')}</div>
@@ -1263,10 +1222,6 @@ function show(idx, focusTab) {
 
   // content 영역 복원
   content.classList.remove('hidden');
-  panels.forEach(p => {
-    const bw = p.querySelector('.back-btn-wrap');
-    if(bw) bw.remove();
-  });
 
   // 섹터 탭 활성화
   tabs.forEach((t, i) => {
@@ -1276,7 +1231,10 @@ function show(idx, focusTab) {
     t.tabIndex = on ? 0 : -1;
   });
 
+  // panels: back-btn-wrap 제거 + hidden 토글 한 번에 처리
   panels.forEach((p, i) => {
+    const bw = p.querySelector('.back-btn-wrap');
+    if(bw) bw.remove();
     const on = i === idx;
     p.classList.toggle('hidden', !on);
     p.setAttribute('aria-hidden', on ? 'false' : 'true');
@@ -1293,7 +1251,11 @@ function show(idx, focusTab) {
     const tabRect = tab.getBoundingClientRect();
     const offset = tabRect.left - navRect.left + nav.scrollLeft - (nav.clientWidth / 2) + (tab.offsetWidth / 2);
     nav.scrollTo({ left: Math.max(0, offset), behavior: 'smooth' });
-    setTimeout(updateNavArrows, 250);
+    if('onscrollend' in window){
+      nav.addEventListener('scrollend', updateNavArrows, {once:true});
+    } else {
+      setTimeout(updateNavArrows, 300);
+    }
   })();
   if (focusTab) tabs[idx].focus();
 
@@ -1301,21 +1263,24 @@ function show(idx, focusTab) {
   safeReplaceHash(DATA[idx].key);
 }
 
-// 키보드 네비게이션: ←→, Home, End
+// 키보드 네비게이션: ←→, Home, End — nav 전체 탭 순환 (홈·관심·교차 포함)
 function onKey(e, idx) {
-  let next = null;
-  if (e.key === 'ArrowRight') next = (idx + 1) % DATA.length;
-  else if (e.key === 'ArrowLeft') next = (idx - 1 + DATA.length) % DATA.length;
-  else if (e.key === 'Home') next = 0;
-  else if (e.key === 'End') next = DATA.length - 1;
-  else if (e.key === 'ArrowDown') {
-    // i2: WAI-ARIA tablist 권고 — ArrowDown 시 활성 패널로 포커스 이동
+  if (e.key === 'ArrowDown') {
+    // WAI-ARIA tablist 권고 — ArrowDown 시 활성 패널로 포커스 이동
     e.preventDefault();
     const panel = panels[idx];
     if(panel) panel.focus();
     return;
   }
-  if (next !== null) { e.preventDefault(); show(next, true); }
+  const allTabs = Array.from(nav.querySelectorAll('.nav-tab'));
+  const activeTab = document.getElementById('tab-' + DATA[idx].key);
+  const curPos = allTabs.indexOf(activeTab);
+  let nextPos = null;
+  if (e.key === 'ArrowRight') nextPos = (curPos + 1) % allTabs.length;
+  else if (e.key === 'ArrowLeft') nextPos = (curPos - 1 + allTabs.length) % allTabs.length;
+  else if (e.key === 'Home') nextPos = 0;
+  else if (e.key === 'End') nextPos = allTabs.length - 1;
+  if (nextPos !== null) { e.preventDefault(); allTabs[nextPos].click(); allTabs[nextPos].focus(); }
 }
 
 
@@ -1332,6 +1297,8 @@ window.addEventListener('hashchange', () => {
 // 홈 그리드 패널
 // ══════════════════════════════════════
 const homePanel = document.getElementById('home-panel');
+const favPanel  = document.getElementById('fav-panel');
+const crossPanel = document.getElementById('cross-panel');
 
 // 섹터 강도 → dot 클래스 + 라벨 (DATA.strength.type 단일 소스)
 const STRENGTH_LABEL = {pos:'실적 동반', warn:'기대 단계'};
@@ -1375,8 +1342,7 @@ function renderHomePanel(){
     // 가장 최근 upd
     let latestUpd = '';
     d.stages.forEach(s => s.stocks.forEach(st => { if(st.upd && (!latestUpd || st.upd > latestUpd)) latestUpd = st.upd; }));
-    const updLabel = latestUpd ? latestUpd.replace(/^\d{4}-(\d{2})-(\d{2})$/, '$1/$2') : '';
-    const updDiff = latestUpd ? Math.floor((new Date() - new Date(latestUpd)) / 86400000) : 99;
+    const {diff: updDiff, label: updLabel} = latestUpd ? dayDiffLabel(latestUpd) : {diff:99, label:''};
     const updCls = updDiff <= 7 ? 'home-upd recent' : 'home-upd old';
 
     // 필터 숨김 여부 — 초기 렌더 시 homeTierFilter 반영
@@ -1435,7 +1401,7 @@ function applyHomeTierFilter(tier){
   let visCount = 0;
   grid.querySelectorAll('.home-card').forEach(card => {
     const key = card.dataset.sectorKey;
-    const d = DATA.find(d => d.key === key);
+    const d = DATA_MAP.get(key);
     const visible = tier === 'all' || (d && sectorHasTier(d, Number(tier)));
     card.classList.toggle('hf-hidden', !visible);
     if(visible) visCount++;
@@ -1513,9 +1479,9 @@ function syncAllFavBtns(){
 
 // ── 공통 카드 HTML (즐겨찾기·교차 패널 공용) ──
 // footerHTML → 순서 버튼 등 (선택), uidSuffix → 중복 uid 방지용
-function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix, sectorKey){
+function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   const isFav = favs.includes(st.n);
-  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${stockLogoHTML(st, sectorKey||'')}${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
+  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
   const uid = 'fav_' + (st.code||st.n.replace(/\s/g,'')) + (uidSuffix ? '_'+uidSuffix : '');
   return `<div class="search-result-item">
     <div class="search-result-meta">
@@ -1535,7 +1501,7 @@ function getFavStocks(){
   const map = {};
   DATA.forEach(d => {
     d.stages.forEach(s => {
-      s.stocks.forEach(st => { map[st.n] = {st, tabName:d.name, stageName:s.t, sectorKey:d.key}; });
+      s.stocks.forEach(st => { map[st.n] = {st, tabName:d.name, stageName:s.t}; });
     });
   });
   return favs.map(n => map[n]).filter(Boolean);
@@ -1550,7 +1516,7 @@ function moveFav(idx, dir){
 }
 
 function renderFavPanel(){
-  const panel = document.getElementById('fav-panel');
+  const panel = favPanel;
   if(!panel.classList.contains('vis')) return;
   if(favs.length === 0){
     panel.innerHTML = '<div class="fav-empty">⭐ 관심종목이 없습니다.<br>카드 우측 ☆ 버튼으로 추가하세요.</div>';
@@ -1558,13 +1524,13 @@ function renderFavPanel(){
   }
   const hint = favs.length > 1 ? '<div class="fav-order-hint">▲▼ 버튼으로 순서 변경</div>' : '';
   const total = favs.length;
-  const items = getFavStocks().map(({st, tabName, stageName, sectorKey}, idx) => {
+  const items = getFavStocks().map(({st, tabName, stageName}, idx) => {
     const footer = total > 1 ? `<div class="fav-card-footer">
       <span class="fav-card-footer-label">${idx+1} / ${total}</span>
       <button class="fav-move-btn" onclick="moveFav(${idx},-1)" ${idx===0?'disabled':''} aria-label="위로">▲ 위로</button>
       <button class="fav-move-btn" onclick="moveFav(${idx},1)" ${idx===total-1?'disabled':''} aria-label="아래로">▼ 아래로</button>
     </div>` : '';
-    return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer, '', sectorKey)}</div>`;
+    return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer)}</div>`;
   }).join('');
   panel.innerHTML = hint + items;
 }
@@ -1594,10 +1560,9 @@ function deactivateAll(){
   content.classList.add('hidden');
   const favTab = document.getElementById('tab-fav');
   if(favTab) favTab.classList.remove('on');
-  document.getElementById('fav-panel').classList.remove('vis');
+  if(favPanel) favPanel.classList.remove('vis');
   const crossTab = document.getElementById('tab-cross');
   if(crossTab) crossTab.classList.remove('on');
-  const crossPanel = document.getElementById('cross-panel');
   if(crossPanel) crossPanel.classList.remove('vis');
   // 홈 패널 비활성화
   const homeTab = document.getElementById('tab-home');
@@ -1610,7 +1575,7 @@ function showFavPanel(){
   const favTab = document.getElementById('tab-fav');
   if(favTab) favTab.classList.add('on');
   current = -2;
-  document.getElementById('fav-panel').classList.add('vis');
+  favPanel.classList.add('vis');
   renderFavPanel();
   window.scrollTo({top:0, behavior:'instant'});
   safeReplaceHash('fav');
@@ -1629,7 +1594,7 @@ function getCrossStocks(){
   DATA.forEach(d => {
     d.stages.forEach(s => {
       s.stocks.forEach(st => {
-        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon, sectorKey:d.key});
+        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon});
       });
     });
   });
@@ -1637,7 +1602,7 @@ function getCrossStocks(){
 }
 
 function renderCrossPanel(){
-  const panel = document.getElementById('cross-panel');
+  const panel = crossPanel;
   if(!panel.classList.contains('vis')) return;
   const list = getCrossStocks();
   if(list.length === 0){
@@ -1646,9 +1611,9 @@ function renderCrossPanel(){
   }
   // 탭별 그룹핑
   const groups = {};
-  list.forEach(({st, tabName, stageName, tabIcon, sectorKey}) => {
+  list.forEach(({st, tabName, stageName, tabIcon}) => {
     const key = tabName;
-    if(!groups[key]) groups[key] = {tabName, tabIcon, sectorKey, items:[]};
+    if(!groups[key]) groups[key] = {tabName, tabIcon, items:[]};
     groups[key].items.push({st, stageName});
   });
   let html = '';
@@ -1657,7 +1622,7 @@ function renderCrossPanel(){
     html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${Number(g.items.length)}종목</div>`;
     html += '<div class="grid" style="margin-bottom:14px">';
     sortedItems.forEach(({st, stageName}) => {
-      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''), g.sectorKey);
+      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''));
     });
     html += '</div>';
   });
@@ -1675,7 +1640,7 @@ function showCrossPanel(){
   const crossTab = document.getElementById('tab-cross');
   if(crossTab) crossTab.classList.add('on');
   current = -3;
-  document.getElementById('cross-panel').classList.add('vis');
+  crossPanel.classList.add('vis');
   renderCrossPanel();
   window.scrollTo({top:0, behavior:'instant'});
   safeReplaceHash('cross');
