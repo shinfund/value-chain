@@ -131,8 +131,8 @@ body{
 }
 .stock:hover{transform:translateY(-2px); box-shadow:var(--shadow-hover)}
 .stock-top{display:flex; align-items:center; justify-content:space-between; gap:6px}
-.stock-name{font-size:14.5px; font-weight:800; color:var(--txt); display:flex; align-items:center; gap:5px}
-.stock-link{text-decoration:none; color:var(--txt); cursor:pointer;}
+.stock-name{font-size:14.5px; font-weight:800; color:var(--txt); display:flex; align-items:center; gap:6px}
+.stock-link{text-decoration:none; color:var(--txt); cursor:pointer; display:flex; align-items:center; gap:6px;}
 .stock-link:hover .stock-link-icon{opacity:1;}
 .stock-link:hover{color:var(--sky600);}
 .stock-link-icon{font-size:11px; color:var(--sky600); opacity:0.45; transition:opacity .15s; flex-shrink:0;}
@@ -156,6 +156,31 @@ body{
   font-size:12px; line-height:1.65; font-weight:500;
 }
 .disc b{font-weight:800}
+
+/* ── 종목 로고 ── */
+.stock-logo{
+  flex-shrink:0; width:28px; height:28px; border-radius:7px;
+  overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:800; letter-spacing:-.03em;
+  border:1px solid var(--border);
+}
+.stock-logo img{
+  width:28px; height:28px; object-fit:contain; display:block;
+}
+.stock-logo.fallback{
+  background:var(--sky50); color:var(--sky800); border-color:var(--sky100);
+}
+.stock-logo.cl-ai{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4;}
+.stock-logo.cl-defense{background:#FAEEDA;color:#633806;border-color:#f5d8a0;}
+.stock-logo.cl-robot{background:#EAF3DE;color:#27500A;border-color:#c5e0a0;}
+.stock-logo.cl-nuke{background:#EEEDFE;color:#3C3489;border-color:#c5c2f8;}
+.stock-logo.cl-power{background:#FAECE7;color:#712B13;border-color:#f0c0ae;}
+.stock-logo.cl-battery{background:#E1F5EE;color:#085041;border-color:#a0ddc8;}
+.stock-logo.cl-mobility{background:#fdf0e6;color:#7a3b00;border-color:#f5c896;}
+.stock-logo.cl-space{background:#f0eafc;color:#4a2080;border-color:#c8aaf0;}
+.stock-logo.cl-quantum{background:#e6f9f5;color:#0a5c50;border-color:#90ddd0;}
+.stock-logo.cl-hydro{background:#e6f4fb;color:#0a4a6e;border-color:#90cce8;}
+.stock-logo.cl-bio{background:#fce8f0;color:#6e0a30;border-color:#e8a0c0;}
 
 /* ── 교차 종목 탭 ── */
 .nav-tab.cross-tab{color:var(--purple800);}
@@ -613,9 +638,9 @@ const DATA = [
       {t:'체계종합·완성품', s:'무기 체계 최상단', stocks:[
         {n:'한화에어로스페이스', code:'012450', tier:1, x:true, upd:'2026-05-30',
           history:[
+            {upd:'2026-05-30', d:'K9·레드백·천무 수출 주도. 지상방산 수주잔고 37.2조. \'26 Q1 영업익 8,546억(+52.4% yoy). ⚠️리스크: 폴란드 의존도 축소 전환기, 중동 지정학 변화'},
             {upd:'2026-05-01', d:'\'26 Q1 잠정 영업익 8,000억대 추정. 폴란드 K9 2차 계약 협상 중. 수주잔고 35조+. ⚠️리스크: 폴란드 의존도 집중'},
             {upd:'2026-03-20', d:'수주잔고 32조. 레드백 장갑차 호주 수출 진행 중. 천무 동유럽 추가 수주 기대. ⚠️리스크: 환율·납기 리스크'},
-            {upd:'2026-05-30', d:'K9·레드백·천무 수출 주도. 지상방산 수주잔고 37.2조. \'26 Q1 영업익 8,546억(+52.4% yoy). ⚠️리스크: 폴란드 의존도 축소 전환기, 중동 지정학 변화'},
           ],
           d:'\'26 Q1 매출 5.75조·영업익 6,389억(+20.6%yoy) — 컨센 하회. 수주잔고 39.7조(역대 최고, 노르웨이 천무 1.3조 포함). 2분기 폴란드·이집트·호주 수출물량 본격화 전망. 다목적무인차량 수주전(vs 현대로템) 진행 중. ⚠️리스크: Q1 영업이익 시장 기대치 하회, 성과급·인건비 변동'},
         {n:'현대로템', code:'064350', tier:1, upd:'2026-05-30',
@@ -630,7 +655,7 @@ const DATA = [
           d:'\'26 Q1 매출 1.09조(+56.3%yoy) 역대 최대. 영업익 671억(컨센 하회). KF-21 양산 1호기 3월 출고. 수주잔고 26.6조. 한화에어로스페이스 경영참여 전환(지분 5.09%·추가 5,000억 매입 예정). 2026년 연간 매출 가이던스 5.73조. ⚠️리스크: 중동 수출 일시 중단·완제기 예정가 조정 → 영업이익 하반기 집중, 밸류 PER 47배 부담'},
       ]},
       {t:'유도무기·미사일', s:'정밀 타격', stocks:[
-        {n:'LIG D&A', code:'079550', tier:1, upd:'2026-05-30',
+        {n:'LIG디펜스앤에어로스페이스', code:'079550', tier:1, upd:'2026-05-30',
           history:[
             {upd:'2026-05-15', d:'수주잔고 26.2조. 천궁·천무·현궁 유도무기 국내 선두. 2026년 LIG넥스원→LIG 디펜스&에어로스페이스 사명 변경. ⚠️리스크: 핵심 무기체계 수출 정부 승인 필요'},
           ],
@@ -1017,6 +1042,27 @@ const DATA = [
 const nav = document.getElementById('nav');
 const content = document.getElementById('content');
 
+// ── 종목 로고 헬퍼 ──
+// code 있으면 네이버 증권 img 시도 → onerror 시 이니셜 배지로 폴백
+function stockLogoHTML(st, sectorKey){
+  const initials = st.n.replace(/[^가-힣A-Za-z0-9]/g,'').slice(0,2) || '?';
+  const cl = 'cl-' + (sectorKey||'');
+  if(st.code){
+    const src = `https://ssl.pstatic.net/imgstock/company/ico/${esc(st.code)}.gif`;
+    // onerror: img 제거 후 span에 이니셜 텍스트노드를 appendChild로 안전하게 삽입
+    const onErr = `(function(img){
+      var p=img.parentNode; if(!p) return;
+      p.classList.add('fallback'); p.classList.add('${cl}');
+      img.parentNode.removeChild(img);
+      p.appendChild(document.createTextNode('${initials}'));
+    })(this)`;
+    return `<span class="stock-logo" id="logo-${esc(st.code)}">` +
+      `<img src="${src}" alt="${esc(st.n)}" onerror="${onErr.replace(/\n\s*/g,' ')}">` +
+      `</span>`;
+  }
+  return `<span class="stock-logo fallback ${cl}">${initials}</span>`;
+}
+
 // XSS 방지: innerHTML 주입 전 이스케이프
 function esc(v){
   return String(v).replace(/[&<>"']/g, c => (
@@ -1152,7 +1198,7 @@ function panelHTML(d){
       return `
       <div class="stock${isKey ? ' stock-key' : ''}" data-name="${esc(st.n)}" data-code="${esc(st.code||'')}">
         <div class="stock-top">
-          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
+          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${stockLogoHTML(st, d.key)}${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
           <span style="display:flex;align-items:center;gap:4px">${isKey ? '<span class="key-badge">★ 핵심</span>' : ''}${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
         <div class="stock-desc">${splitRisk(esc(st.d), 'risk')}</div>
@@ -1467,9 +1513,9 @@ function syncAllFavBtns(){
 
 // ── 공통 카드 HTML (즐겨찾기·교차 패널 공용) ──
 // footerHTML → 순서 버튼 등 (선택), uidSuffix → 중복 uid 방지용
-function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
+function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix, sectorKey){
   const isFav = favs.includes(st.n);
-  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
+  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${stockLogoHTML(st, sectorKey||'')}${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
   const uid = 'fav_' + (st.code||st.n.replace(/\s/g,'')) + (uidSuffix ? '_'+uidSuffix : '');
   return `<div class="search-result-item">
     <div class="search-result-meta">
@@ -1489,7 +1535,7 @@ function getFavStocks(){
   const map = {};
   DATA.forEach(d => {
     d.stages.forEach(s => {
-      s.stocks.forEach(st => { map[st.n] = {st, tabName:d.name, stageName:s.t}; });
+      s.stocks.forEach(st => { map[st.n] = {st, tabName:d.name, stageName:s.t, sectorKey:d.key}; });
     });
   });
   return favs.map(n => map[n]).filter(Boolean);
@@ -1512,13 +1558,13 @@ function renderFavPanel(){
   }
   const hint = favs.length > 1 ? '<div class="fav-order-hint">▲▼ 버튼으로 순서 변경</div>' : '';
   const total = favs.length;
-  const items = getFavStocks().map(({st, tabName, stageName}, idx) => {
+  const items = getFavStocks().map(({st, tabName, stageName, sectorKey}, idx) => {
     const footer = total > 1 ? `<div class="fav-card-footer">
       <span class="fav-card-footer-label">${idx+1} / ${total}</span>
       <button class="fav-move-btn" onclick="moveFav(${idx},-1)" ${idx===0?'disabled':''} aria-label="위로">▲ 위로</button>
       <button class="fav-move-btn" onclick="moveFav(${idx},1)" ${idx===total-1?'disabled':''} aria-label="아래로">▼ 아래로</button>
     </div>` : '';
-    return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer)}</div>`;
+    return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer, '', sectorKey)}</div>`;
   }).join('');
   panel.innerHTML = hint + items;
 }
@@ -1583,7 +1629,7 @@ function getCrossStocks(){
   DATA.forEach(d => {
     d.stages.forEach(s => {
       s.stocks.forEach(st => {
-        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon});
+        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon, sectorKey:d.key});
       });
     });
   });
@@ -1600,9 +1646,9 @@ function renderCrossPanel(){
   }
   // 탭별 그룹핑
   const groups = {};
-  list.forEach(({st, tabName, stageName, tabIcon}) => {
+  list.forEach(({st, tabName, stageName, tabIcon, sectorKey}) => {
     const key = tabName;
-    if(!groups[key]) groups[key] = {tabName, tabIcon, items:[]};
+    if(!groups[key]) groups[key] = {tabName, tabIcon, sectorKey, items:[]};
     groups[key].items.push({st, stageName});
   });
   let html = '';
@@ -1611,7 +1657,7 @@ function renderCrossPanel(){
     html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${Number(g.items.length)}종목</div>`;
     html += '<div class="grid" style="margin-bottom:14px">';
     sortedItems.forEach(({st, stageName}) => {
-      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''));
+      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''), g.sectorKey);
     });
     html += '</div>';
   });
