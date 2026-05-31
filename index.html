@@ -81,6 +81,11 @@ body{
 .nav-tab.on{background:var(--sky50); color:var(--sky800)}
 .nav-tab:focus-visible{outline:2px solid var(--sky); outline-offset:1px}
 .nav-tab .cnt{display:none;}
+.nav-tab.fav-tab .cnt,.nav-tab.cross-tab .cnt{
+  display:inline-flex; align-items:center; justify-content:center;
+  vertical-align:middle; font-size:11px; font-weight:800;
+  padding:1px 6px; border-radius:20px; line-height:1.4; min-width:18px;
+}
 
 /* 메인 — fixed 헤더 높이만큼 padding-top은 JS가 동적으로 설정 */
 .main{padding:16px 14px 60px}
@@ -363,6 +368,49 @@ body{
 /* 홈 탭 버튼 */
 .nav-tab.home-tab{color:var(--sky800);}
 .nav-tab.home-tab.on{background:var(--sky50); color:var(--sky800);}
+
+/* ── 홈 티어 필터 바 ── */
+.home-filter-bar{
+  display:flex; gap:7px; flex-wrap:wrap;
+  margin-bottom:14px; align-items:center;
+}
+.home-filter-label{
+  font-size:11.5px; font-weight:700; color:var(--txt3);
+  margin-right:2px; white-space:nowrap; align-self:center;
+}
+.hf-btn{
+  border:1.5px solid var(--border); background:var(--card);
+  border-radius:20px; padding:5px 13px;
+  font-size:12px; font-weight:700; cursor:pointer;
+  color:var(--txt3); font-family:inherit;
+  transition:all .15s; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.hf-btn:hover{border-color:var(--sky100); color:var(--sky600);}
+.hf-btn.on{border-color:transparent; color:#fff;}
+.hf-btn.all.on{background:var(--sky); border-color:var(--sky);}
+.hf-btn.t1.on{background:var(--coral); border-color:var(--coral);}
+.hf-btn.t2.on{background:var(--sky600); border-color:var(--sky600);}
+.hf-btn.t3.on{background:#8B96A8; border-color:#8B96A8;}
+.hf-btn .hf-cnt{
+  display:inline-flex; align-items:center; justify-content:center;
+  vertical-align:middle; font-size:10.5px; font-weight:800;
+  padding:1px 6px; border-radius:10px; line-height:1.4; min-width:18px;
+  background:rgba(255,255,255,.25);
+}
+.hf-btn:not(.on) .hf-cnt{background:var(--sky50); color:var(--sky800);}
+.hf-btn.t1:not(.on) .hf-cnt{background:var(--coral50); color:var(--coral800);}
+.hf-btn.t2:not(.on) .hf-cnt{background:var(--sky50); color:var(--sky800);}
+.hf-btn.t3:not(.on) .hf-cnt{background:var(--gray50); color:var(--txt3);}
+
+/* 홈 카드 필터 숨김 */
+.home-card.hf-hidden{display:none;}
+
+/* 홈 필터 빈 상태 */
+.home-filter-empty{
+  grid-column:1/-1; text-align:center;
+  padding:40px 20px; font-size:14px; color:var(--txt3); font-weight:600;
+}
 
 /* 섹터 진입 후 뒤로가기 버튼 */
 .back-btn{
@@ -886,7 +934,7 @@ function dayDiffLabel(upd){
   const diff = Math.floor((new Date() - new Date(upd)) / 86400000);
   if(diff === 0) return '오늘';
   if(diff <= 7) return `${diff}일 전`;
-  return upd.replace(/^2026-/, '').replace(/^20\d\d-/, y => y.slice(0,4)+'.');
+  return upd.replace(/^\d{4}-(\d{2})-(\d{2})$/, (_, m, d) => m + '/' + d);
 }
 
 // ── [r1] 리스크 파싱 공통 헬퍼 ──
@@ -1093,24 +1141,34 @@ window.addEventListener('hashchange', () => {
 // ══════════════════════════════════════
 const homePanel = document.getElementById('home-panel');
 
-// 섹터 강도 → dot 클래스 + 라벨 매핑
-const STRENGTH_MAP = {
-  ai:       {cls:'pos', label:'실적 동반'},
-  defense:  {cls:'pos', label:'실적 동반'},
-  robot:    {cls:'pos', label:'성장'},
-  nuke:     {cls:'pos', label:'실적 동반'},
-  power:    {cls:'pos', label:'실적 동반'},
-  battery:  {cls:'warn', label:'하반기 기대'},
-  mobility: {cls:'warn', label:'기대 단계'},
-  space:    {cls:'warn', label:'장기 테마'},
-  quantum:  {cls:'neg', label:'초기 단계'},
-  hydro:    {cls:'neg', label:'정책 의존'},
-  bio:      {cls:'pos', label:'실적 동반'},
-};
+// 섹터 강도 → dot 클래스 + 라벨 (DATA.strength.type 단일 소스)
+const STRENGTH_LABEL = {pos:'실적 동반', warn:'기대 단계', neg:'초기 단계'};
+function sectorStrength(d){
+  const type = d.strength ? d.strength.type : 'warn';
+  // STRENGTH_MAP 라벨이 섹터마다 달랐으나 DATA.strength.txt 앞부분으로 대체
+  // 간결 라벨은 type 기반으로 통일 (홈카드는 짧은 라벨만 표시)
+  return {cls: type, label: STRENGTH_LABEL[type] || '기대 단계'};
+}
+
+// ── 홈 티어 필터 상태 ──
+let homeTierFilter = 'all'; // 'all' | '1' | '2' | '3'
+
+// 섹터가 특정 tier 종목을 보유하는지 확인
+function sectorHasTier(d, tier){
+  return d.stages.some(s => s.stocks.some(st => Number(st.tier) === tier));
+}
+
+// 티어별 종목 수 집계
+function countSectorsByTier(tier){
+  if(tier === 'all') return DATA.reduce((a,d) => a + countStocks(d), 0);
+  return DATA.reduce((a,d) =>
+    a + d.stages.reduce((b,s) =>
+      b + s.stocks.filter(st => Number(st.tier) === Number(tier)).length, 0), 0);
+}
 
 function renderHomePanel(){
   const cards = DATA.map((d, i) => {
-    const sm = STRENGTH_MAP[d.key] || {cls:'warn', label:''};
+    const sm = sectorStrength(d);
 
     // 종목 수
     const stockCount = countStocks(d);
@@ -1125,11 +1183,14 @@ function renderHomePanel(){
     // 가장 최근 upd
     let latestUpd = '';
     d.stages.forEach(s => s.stocks.forEach(st => { if(st.upd && (!latestUpd || st.upd > latestUpd)) latestUpd = st.upd; }));
-    const updLabel = latestUpd ? latestUpd.replace(/^2026-/,'').replace('-','/') : '';
+    const updLabel = latestUpd ? latestUpd.replace(/^\d{4}-(\d{2})-(\d{2})$/, '$1/$2') : '';
     const updDiff = latestUpd ? Math.floor((new Date() - new Date(latestUpd)) / 86400000) : 99;
     const updCls = updDiff <= 7 ? 'home-upd recent' : 'home-upd old';
 
-    return `<div class="home-card" onclick="showFromHome(${i})" role="button" tabindex="0"
+    // 필터 숨김 여부 — 초기 렌더 시 homeTierFilter 반영
+    const hidden = (homeTierFilter !== 'all' && !sectorHasTier(d, Number(homeTierFilter))) ? ' hf-hidden' : '';
+
+    return `<div class="home-card${hidden}" data-sector-key="${esc(d.key)}" onclick="showFromHome(${i})" role="button" tabindex="0"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showFromHome(${i})}">
       <div class="home-card-top">
         <span class="home-card-icon">${esc(d.icon)}</span>
@@ -1144,15 +1205,71 @@ function renderHomePanel(){
       ${keyNames ? `<div class="home-key-row">${keyNames}</div>` : ''}
     </div>`;
   }).join('');
-  homePanel.innerHTML = `<div class="home-grid">${cards}</div>`;
+
+  // 필터 바 HTML
+  const filterBar = buildHomeTierFilterBar();
+
+  homePanel.innerHTML = filterBar + `<div class="home-grid" id="home-grid">${cards}</div>`;
 }
 
-function showHomePanel(){
+function buildHomeTierFilterBar(){
+  const cnt = {
+    all: DATA.length,
+    '1': countSectorsByTier('1'),
+    '2': countSectorsByTier('2'),
+    '3': countSectorsByTier('3'),
+  };
+  const btns = [
+    {key:'all', cls:'all', label:'전체'},
+    {key:'1',   cls:'t1',  label:'독보'},
+    {key:'2',   cls:'t2',  label:'선두'},
+    {key:'3',   cls:'t3',  label:'성장'},
+  ].map(({key, cls, label}) => {
+    const on = homeTierFilter === key ? ' on' : '';
+    return `<button class="hf-btn ${cls}${on}" onclick="applyHomeTierFilter('${key}')">${label}<span class="hf-cnt">${cnt[key]}</span></button>`;
+  }).join('');
+  return `<div class="home-filter-bar"><span class="home-filter-label">티어</span>${btns}</div>`;
+}
+
+function applyHomeTierFilter(tier){
+  homeTierFilter = tier;
+  // 필터 버튼 on 상태 갱신
+  document.querySelectorAll('.hf-btn').forEach(b => {
+    const bKey = b.getAttribute('onclick').match(/'([^']+)'/)[1];
+    b.classList.toggle('on', bKey === tier);
+  });
+  // 카드 show/hide
+  const grid = document.getElementById('home-grid');
+  if(!grid) return;
+  let visCount = 0;
+  grid.querySelectorAll('.home-card').forEach(card => {
+    const key = card.dataset.sectorKey;
+    const d = DATA.find(d => d.key === key);
+    const visible = tier === 'all' || (d && sectorHasTier(d, Number(tier)));
+    card.classList.toggle('hf-hidden', !visible);
+    if(visible) visCount++;
+  });
+  // 빈 상태 처리
+  let emptyEl = grid.querySelector('.home-filter-empty');
+  if(visCount === 0){
+    if(!emptyEl){
+      emptyEl = document.createElement('div');
+      emptyEl.className = 'home-filter-empty';
+      emptyEl.textContent = '해당 티어 종목이 없습니다.';
+      grid.appendChild(emptyEl);
+    }
+  } else {
+    if(emptyEl) emptyEl.remove();
+  }
+}
+
+function showHomePanel(resetFilter){
   deactivateAll();
   homePanel.classList.remove('hidden');
   const homeTab = document.getElementById('tab-home');
   if(homeTab) homeTab.classList.add('on');
   current = -4;
+  if(resetFilter) homeTierFilter = 'all';
   renderHomePanel();
   window.scrollTo({top:0, behavior:'instant'});
   safeReplaceHash('home');
@@ -1204,11 +1321,11 @@ function syncAllFavBtns(){
 }
 
 // ── 공통 카드 HTML (즐겨찾기·교차 패널 공용) ──
-// footerHTML → 순서 버튼 등 (선택)
-function favCardHTML(st, tabName, stageName, footerHTML){
+// footerHTML → 순서 버튼 등 (선택), uidSuffix → 중복 uid 방지용
+function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   const isFav = favs.includes(st.n);
   const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
-  const uid = 'fav_' + (st.code||st.n.replace(/\s/g,''));
+  const uid = 'fav_' + (st.code||st.n.replace(/\s/g,'')) + (uidSuffix ? '_'+uidSuffix : '');
   return `<div class="search-result-item">
     <div class="search-result-meta">
       <span class="tab-badge">${esc(tabName)}</span>
@@ -1350,7 +1467,7 @@ function renderCrossPanel(){
     html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${Number(g.items.length)}종목</div>`;
     html += '<div class="grid" style="margin-bottom:14px">';
     sortedItems.forEach(({st, stageName}) => {
-      html += favCardHTML(st, g.tabName, stageName);
+      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''));
     });
     html += '</div>';
   });
