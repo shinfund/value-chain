@@ -241,7 +241,7 @@ body{
 .hist-wrap{
   overflow:hidden; max-height:0; transition:max-height .28s ease;
 }
-.hist-wrap.open{max-height:600px;}
+.hist-wrap.open{max-height:2000px;}
 .hist-list{
   margin-top:7px; padding:8px 10px 6px;
   background:var(--gray50); border-radius:var(--r8);
@@ -377,6 +377,7 @@ body{
 }
 .home-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-hover); border-color:var(--sky100);}
 .home-card:active{transform:scale(.97);}
+.home-card:focus-visible{outline:2px solid var(--sky); outline-offset:2px;}
 
 .home-card-top{
   display:flex; align-items:center; justify-content:space-between; gap:4px;
@@ -595,8 +596,8 @@ const DATA = [
         {n:'기가비스', code:'435870', tier:3, upd:'2026-04-20', d:'PCB 검사 장비. 기판 난도 상승 수혜. ⚠️리스크: 소형주 유동성'},
       ]},
       {t:'데이터센터 전력', s:'AI의 연료', stocks:[
-        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, upd:'2026-05-20', d:'초고압 변압기 북미 수출 주도. \'26 Q1 수주잔고 50.8억달러(약 6.99조). 전력기기 대장주. ⚠️리스크: 수주잔고 소화 지연 시 매출 인식 이연'},
-        {n:'지엔씨에너지', code:'119850', tier:1, x:true, upd:'2026-05-20', d:'데이터센터 비상발전기 국내 점유율 70% 독점. AI 데이터센터 확장 직결. ⚠️리스크: 소형주 변동성'},
+        {n:'HD현대일렉트릭', code:'267260', tier:1, upd:'2026-05-20', d:'초고압 변압기 북미 수출 주도. \'26 Q1 수주잔고 50.8억달러(약 6.99조). 전력기기 대장주. ⚠️리스크: 수주잔고 소화 지연 시 매출 인식 이연'},
+        {n:'지엔씨에너지', code:'119850', tier:1, upd:'2026-05-20', d:'데이터센터 비상발전기 국내 점유율 70% 독점. AI 데이터센터 확장 직결. ⚠️리스크: 소형주 변동성'},
         {n:'산일전기', code:'062040', tier:2, upd:'2026-05-10', d:'AI 데이터센터 변압기 수혜. \'26 실적 가시화 구간. ⚠️리스크: 후발주자 포지션'},
       ]},
       {t:'소프트웨어·서비스', s:'국산 모델·인프라', stocks:[
@@ -619,7 +620,7 @@ const DATA = [
     ],
     stages:[
       {t:'체계종합·완성품', s:'무기 체계 최상단', stocks:[
-        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, upd:'2026-06-01',
+        {n:'한화에어로스페이스', code:'012450', tier:1, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'\'26 Q1 매출 5.75조·영업익 6,389억(+20.6%yoy) — 컨센 하회. 수주잔고 39.7조(역대 최고, 노르웨이 천무 1.3조 포함). 2분기 폴란드·이집트·호주 수출물량 본격화 전망. ⚠️리스크: Q1 영업이익 시장 기대치 하회, 성과급·인건비 변동'},
             {upd:'2026-05-01', d:'\'26 Q1 잠정 영업익 8,000억대 추정. 폴란드 K9 2차 계약 협상 중. 수주잔고 35조+. ⚠️리스크: 폴란드 의존도 집중'},
@@ -632,7 +633,7 @@ const DATA = [
             {upd:'2026-05-20', d:'\'26 Q1 매출 1.46조·영업익 2,242억·이익률 15.4% 역대 최대. 수주잔고 30조 목전. 방산·철도 쌍끌이. ⚠️리스크: 단기 급등 후 밸류에이션 부담'},
           ],
           d:'방산(DS) 수주잔고 10.5조·레일솔루션(RS) 수주잔고 19조(뉴욕 NYCT 전동차 10조 규모 입찰 9월 결과 발표). 루마니아 K2 전차 수주 금융 장벽 해소 신호. 이라크 K2 전차 공급 추진. 2026년 연간 영업익 1.19조(+18%yoy) 전망. 목표주가 유안타 30만원·평균 컨센 30.4만원. ⚠️리스크: 방산 밸류에이션 부담(PER 고평가 구간), 철도부문 마진 희석, 다목적무인차량 수주전 진행 중'},
-        {n:'한국항공우주', code:'047810', tier:1, x:true, upd:'2026-06-01',
+        {n:'한국항공우주', code:'047810', tier:1, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'\'26 Q1 매출 1.09조(+56.3%yoy) 역대 최대. 영업익 671억(컨센 하회). KF-21 양산 1호기 3월 출고. 수주잔고 26.6조. 한화에어로스페이스 경영참여(지분 5.09%·추가 5,000억). ⚠️리스크: 중동 수출 일시 중단·완제기 예정가 조정'},
             {upd:'2026-05-20', d:'수주잔고 27.3조. KF-21 전투용 적합 판정 완료 → 양산 수혜 임박. FA-50 수출 확대. ⚠️리스크: KF-21 양산 계약 확정 지연 가능성'},
@@ -649,8 +650,8 @@ const DATA = [
         {n:'한화시스템', code:'272210', tier:2, upd:'2026-05-10', d:'KF-21 AESA 레이더·항전시스템 핵심 공급. UAM·드론봇 교차 수혜. ⚠️리스크: KF-21 일정 연동'},
       ]},
       {t:'무인체계·드론봇', s:'유무인복합(MUM-T)', stocks:[
-        {n:'현대로템', code:'064350', tier:1, x:true, upd:'2026-06-01', d:'피지컬AI 국책과제 2건 수주(5/26). HR-셰르파 다목적무인차량 수주전(vs 한화에어로) 진행 중. 이라크 K2 전차·자율 무인차량 동반 공급 논의.'},
-        {n:'한화에어로스페이스', code:'012450', tier:1, x:true, upd:'2026-06-01', d:'다목적무인차량 아리온스멧 수주전 진행. 사우디 MNG 패키지에 무인차량 포함. 동유럽 무인전장 시장 공략.'},
+        {n:'현대로템', code:'064350', tier:1, upd:'2026-06-01', d:'피지컬AI 국책과제 2건 수주(5/26). HR-셰르파 다목적무인차량 수주전(vs 한화에어로) 진행 중. 이라크 K2 전차·자율 무인차량 동반 공급 논의.'},
+        {n:'한화에어로스페이스', code:'012450', tier:1, upd:'2026-06-01', d:'다목적무인차량 아리온스멧 수주전 진행. 사우디 MNG 패키지에 무인차량 포함. 동유럽 무인전장 시장 공략.'},
         {n:'퍼스텍', code:'010820', tier:3, upd:'2026-04-20', d:'군용 드론·UAV 부품·탑재체. ⚠️리스크: 소형주 변동성·드론 정책 변화'},
         {n:'켄코아에어로스페이스', code:'298060', tier:3, upd:'2026-04-20', d:'항공·드론 복합소재 구조물. ⚠️리스크: 수주 가시성 낮음'},
       ]},
@@ -741,7 +742,7 @@ const DATA = [
         {n:'에너토크', code:'019770', tier:3, upd:'2026-05-30', d:'밸브 구동장치(액추에이터). 유럽 WAA와 대규모 공급 계약 체결·현지 수요 대응 본격화. 폐로 시장도 수요 증가. ⚠️리스크: 소형주 변동성'},
       ]},
       {t:'전력기기·교차 수혜', s:'원전 인프라', stocks:[
-        {n:'LS ELECTRIC', code:'010120', tier:2, x:true, upd:'2026-05-30', d:'원전·데이터센터 전력 교차 수혜. \'26 Q1 역대 최대(매출 1.4조·영업익 1,266억). 북미 빅테크 DC 1,703억 신규 수주(5/13). ⚠️리스크: 단기 고밸류, 2분기 판가 인상 반영 후 정상화 여부 확인 필요'},
+        {n:'LS ELECTRIC', code:'010120', tier:2, upd:'2026-05-30', d:'원전·데이터센터 전력 교차 수혜. \'26 Q1 역대 최대(매출 1.4조·영업익 1,266억). 북미 빅테크 DC 1,703억 신규 수주(5/13). ⚠️리스크: 단기 고밸류, 2분기 판가 인상 반영 후 정상화 여부 확인 필요'},
         {n:'보성파워텍', code:'006910', tier:3, upd:'2026-04-20', d:'원전 전력기기 부품. SMR 공급망 편입 기대. ⚠️리스크: 수주 가시성 낮음'},
       ]},
     ]
@@ -759,7 +760,7 @@ const DATA = [
     ],
     stages:[
       {t:'중전기기·변압기', s:'초고압 변압기 핵심', stocks:[
-        {n:'HD현대일렉트릭', code:'267260', tier:1, x:true, upd:'2026-06-01',
+        {n:'HD현대일렉트릭', code:'267260', tier:1, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'\'26 Q1 매출 1.04조(+2.1%)·영업익 2,583억(+18.4%·이익률 24.9%). 수주잔고 78.9억달러(+28.2%, 80억달러 목전). Q1 신규수주 17.97억달러(+34.6%), 북미 비중 73.2%. 분기 최대 수주. ⚠️리스크: 매출 성장 +2.1%로 둔화, 관세 비용 변수'},
             {upd:'2026-05-20', d:'초고압 변압기 북미 수출 주도. 수주잔고 50.8억달러(약 6.99조), 3년치 이상 장납기. 전력기기 대장주. ⚠️리스크: 장납기 물량 인식 지연, 주가 고평가 구간'},
@@ -770,7 +771,7 @@ const DATA = [
             {upd:'2026-05-30', d:'Q1 역대 최대(매출 1.4조·영업익 1,266억). 수주잔고 5.6조. 북미 빅테크 DC 1,703억 신규 수주(5/13). 2026년 연간 영업익 6,376억(+50%yoy) 전망. ⚠️리스크: Q1 성과급 일회성 비용, 원자재 판가 미스매칭'},
           ],
           d:'주가 1년 490% 상승(K전력 빅3 중 최고). 단납기(배전반) 구조 — 수주→매출 전환 속도 빠름. 북미 신규 수주 비중 50%+ 돌파. Q2부터 Q1 이연분 정상화·배전반 수주잔고 기반 연속 성장 구간. 빅테크 고객사 반복 수주 구조 완성. 목표주가 26만원(유안타, 28F EPS 기준). ⚠️리스크: 고밸류에이션(시총 42조), 초고압 변압기 비중 LS에코에너지 대비 제한적'},
-        {n:'효성중공업', code:'298040', tier:2, x:true, upd:'2026-06-01',
+        {n:'효성중공업', code:'298040', tier:2, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'\'26 Q1 매출 1.36조(+26.2%)·영업익 1,523억(+48.7%). 수주잔고 15.1조 사상최대·전력기기 합산 20.2조. 765kV 9,200억 수주. 2분기 영업익 3,000억 예상. ⚠️리스크: 건설부문 부진, 관세 비용 보전 변수'},
           ],
@@ -786,7 +787,7 @@ const DATA = [
         {n:'대한전선', code:'001440', tier:3, upd:'2026-06-01', d:'초고압 전선·케이블. 미·일 전력 동맹(5,500억달러) 송전선 교체 수요 수혜. 2025~2032년 EPS CAGR 32% 전망(KB증권). ⚠️리스크: 재무구조 관리 필요'},
       ]},
       {t:'데이터센터 전원', s:'비상발전·UPS', stocks:[
-        {n:'지엔씨에너지', code:'119850', tier:1, x:true, upd:'2026-06-01',
+        {n:'지엔씨에너지', code:'119850', tier:1, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'DC 비상발전기 국내 점유율 70% 독점. DC 전력 패러다임: 디젤→가스터빈 전환 수혜. SK-AWS 울산DC 납기 2027.08~. 2026년 PER 10~12배. ⚠️리스크: 소형주 유동성, 가스터빈 전환 시점 지연'},
           ],
@@ -872,8 +873,8 @@ const DATA = [
         {n:'모트렉스', code:'118990', tier:2, upd:'2026-05-30', d:'차량용 인포테인먼트·디스플레이 HMI. 2026년 매출 7,606억(+8.3%)·영업익 510억(+21.7%) 전망. 자회사 전진건설로봇(OPM 20%↑) 고마진 사업 보유. ⚠️리스크: 중소형 벤더 경쟁, 완성차 발주 변동'},
       ]},
       {t:'UAM·항공 모빌리티', s:'도심 항공', stocks:[
-        {n:'한화시스템', code:'272210', tier:2, x:true, upd:'2026-05-10', d:'UAM 기체·통신·센서 수직통합. 국내 UAM 선두. ⚠️리스크: UAM 상용화 시기 지연'},
-        {n:'한국항공우주', code:'047810', tier:2, x:true, upd:'2026-05-20', d:'UAM 기체 설계·인증. 군·민 항공 플랫폼 활용. ⚠️리스크: 인증 지연'},
+        {n:'한화시스템', code:'272210', tier:2, upd:'2026-05-10', d:'UAM 기체·통신·센서 수직통합. 국내 UAM 선두. ⚠️리스크: UAM 상용화 시기 지연'},
+        {n:'한국항공우주', code:'047810', tier:2, upd:'2026-05-20', d:'UAM 기체 설계·인증. 군·민 항공 플랫폼 활용. ⚠️리스크: 인증 지연'},
       ]},
       {t:'전장·차량용 SW', s:'차량용 칩·플랫폼', stocks:[
         {n:'현대오토에버', code:'307950', tier:2, upd:'2026-06-01',
@@ -1001,7 +1002,7 @@ const DATA = [
         {n:'범한퓨얼셀', code:'383220', tier:3, upd:'2026-04-20', d:'잠수함·건물용 연료전지. ⚠️리스크: 소형주 변동성'},
       ]},
       {t:'생산·인프라', s:'수소 생산·충전', stocks:[
-        {n:'효성중공업', code:'298040', tier:2, x:true, upd:'2026-06-01',
+        {n:'효성중공업', code:'298040', tier:2, upd:'2026-06-01',
           history:[
             {upd:'2026-05-30', d:'수소 사업 완급 조절 — 변압기 초호황에 수소는 중장기 포지션. 액화수소 울산 린데 플랜트 시험 생산 중(본격 가동 협의). 광양 액화수소충전소 구축·경남권 확대 중. 수소엔진발전 사업 추가 확장. ⚠️리스크: 수소 충전 인프라 투자 회수 기간 길어, 단기 실적은 변압기 부문이 압도'},
           ],
@@ -1036,7 +1037,7 @@ const DATA = [
             {upd:'2026-05-20', d:'바이오의약품 CDMO 글로벌 생산능력 1위. 5공장 가동 세계 최대 capa. 글로벌 시총 607억달러(3위). ⚠️리스크: 노사갈등 이슈, 고밸류에이션'},
           ],
           d:'Q1 매출 1.26조(+26%)·영업익 5,808억(+35%) 역대 최대. 연간 매출 가이던스 +15~20%(5조원 중반 추산). 누적 수주 CMO 112건·CDO 169건·214억달러. 5/1~5/5 총파업(2,800명·창사 이래 최초)·5/22 중재 재개·협상 진행 중. 6공장(18만L) 착공 허가 신청 중. ⚠️리스크: 노조 2차 파업 가능성(임금 인상·성과급 분쟁 미타결), 2Q 생산 일시 차질'},
-        {n:'삼성에피스홀딩스', tier:2, upd:'2026-06-01',
+        {n:'삼성에피스홀딩스', /* code: 미확인 — 네이버증권 공식 코드 확인 후 추가 필요 */ tier:2, upd:'2026-06-01',
           history:[
             {upd:'2026-05-10', d:'삼성바이오에피스 모회사. 인적분할 후 바이오시밀러 저평가 탈출 기대. ⚠️리스크: 분할 후 유동성 확인 필요'},
           ],
@@ -1084,6 +1085,11 @@ const nav = document.getElementById('nav');
 const content = document.getElementById('content');
 // key → sector 객체 Map (applyHomeTierFilter O(1) 조회용)
 const DATA_MAP = new Map(DATA.map(d => [d.key, d]));
+// ── 종목명 → {st, tabName, stageName} 역방향 Map (getFavStocks 매 호출 재순회 방지) ──
+const STOCK_MAP = new Map();
+DATA.forEach(d => d.stages.forEach(s => s.stocks.forEach(st => {
+  STOCK_MAP.set(st.n, {st, tabName: d.name, stageName: s.t});
+})));
 
 // ── 앱 업데이트 날짜 단일 관리 ──
 // DATA 전체 종목 중 가장 최신 upd를 자동 산출 → 헤더 날짜 한 곳만 수정하면 전체 반영
@@ -1099,6 +1105,8 @@ const DATA_MAP = new Map(DATA.map(d => [d.key, d]));
 })();
 
 // XSS 방지: innerHTML 주입 전 이스케이프
+// ── 리스크 구분자 전역 상수 (splitRisk·buildHistHTML 공용) ──
+const RISK_MARK = '⚠️리스크:';
 function esc(v){
   return String(v).replace(/[&<>"']/g, c => (
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
@@ -1113,7 +1121,7 @@ function tierLabel(t){
   return '<span class="lead t3">성장</span>';
 }
 
-// ── [r3] 섹터 총 종목 수 집계 헬퍼 ──
+// ── 섹터 총 종목 수 집계 헬퍼 ──
 function countStocks(d){
   return d.stages.reduce((a, s) => a + s.stocks.length, 0);
 }
@@ -1140,10 +1148,9 @@ function dayDiffLabel(upd){
 
 // ── [r1] 리스크 파싱 공통 헬퍼 ── (메인 카드 전용)
 function splitRisk(escaped, riskSpanClass){
-  const riskMark = '⚠️리스크:';
-  const idx = escaped.indexOf(riskMark);
+  const idx = escaped.indexOf(RISK_MARK);
   const main = (idx === -1 ? escaped : escaped.slice(0, idx)).trim();
-  const risk = idx === -1 ? '' : escaped.slice(idx + riskMark.length).trim();
+  const risk = idx === -1 ? '' : escaped.slice(idx + RISK_MARK.length).trim();
   const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(risk)}</span>` : '';
   return mainToBullets(main) + riskHTML;
 }
@@ -1167,7 +1174,7 @@ function riskToBullets(text){
 function mainToBullets(text){
   if(!text) return text;
   const raw = text
-    .split(/\.\s+(?=[A-Z가-힣0-9\'\"\`\[—\-])/)
+    .split(/(?:\.\s+(?=[A-Z가-힣0-9\'\"\`\[—\-])|·\s+)/)
     .map(s => s.replace(/\.$/, '').trim())
     .filter(s => s.length > 0);
   if(raw.length < 2) return esc(text);
@@ -1194,10 +1201,9 @@ function buildHistHTML(hist){
     const {label} = dayDiffLabel(h.upd);
     const isLatest = i === 0;
     // 이력 본문: 원문을 전달 — mainToBullets/riskToBullets 내부에서 esc() 처리
-    const riskMark = '⚠️리스크:';
-    const rawIdx = h.d.indexOf(riskMark);
+    const rawIdx = h.d.indexOf(RISK_MARK);
     const mainText = (rawIdx === -1 ? h.d : h.d.slice(0, rawIdx)).trim();
-    const riskText = rawIdx === -1 ? '' : h.d.slice(rawIdx + riskMark.length).trim();
+    const riskText = rawIdx === -1 ? '' : h.d.slice(rawIdx + RISK_MARK.length).trim();
     const mainHTML = mainToBullets(mainText);
     const riskHTML = riskText ? `<span class="hist-risk"><span style="font-size:11px;font-weight:700;">⚠️ 리스크</span> ${riskToBullets(riskText)}</span>` : '';
     return `<div class="hist-item">
@@ -1373,11 +1379,7 @@ function show(idx, focusTab) {
     const tabRect = tab.getBoundingClientRect();
     const offset = tabRect.left - navRect.left + nav.scrollLeft - (nav.clientWidth / 2) + (tab.offsetWidth / 2);
     nav.scrollTo({ left: Math.max(0, offset), behavior: 'smooth' });
-    if('onscrollend' in window){
-      nav.addEventListener('scrollend', updateNavArrows, {once:true});
-    } else {
-      setTimeout(updateNavArrows, 300);
-    }
+    onScrollEnd(nav, updateNavArrows);
   })();
   if (focusTab) tabs[idx].focus();
 
@@ -1550,13 +1552,12 @@ function applyHomeTierFilter(tier){
   }
 }
 
-function showHomePanel(resetFilter){
+function showHomePanel(){
   deactivateAll();
   homePanel.classList.remove('hidden');
   const homeTab = document.getElementById('tab-home');
   if(homeTab) homeTab.classList.add('on');
   current = -4;
-  if(resetFilter) homeTierFilter = 'all';
   renderHomePanel();
   window.scrollTo({top:0, behavior:'instant'});
   safeReplaceHash('home');
@@ -1628,13 +1629,7 @@ function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   </div>`;
 }
 function getFavStocks(){
-  const map = {};
-  DATA.forEach(d => {
-    d.stages.forEach(s => {
-      s.stocks.forEach(st => { map[st.n] = {st, tabName:d.name, stageName:s.t}; });
-    });
-  });
-  return favs.map(n => map[n]).filter(Boolean);
+  return favs.map(n => STOCK_MAP.get(n)).filter(Boolean);
 }
 
 function moveFav(idx, dir){
@@ -1669,9 +1664,6 @@ function updateFavTab(){
   if(btn) btn.querySelector('.cnt').textContent = favs.length;
 }
 
-// 즐겨찾기 탭 버튼 추가 — nav 맨 앞에 삽입
-makeSpecialTab('tab-fav', 'nav-tab fav-tab', `<span>관심종목</span><span class="cnt">${favs.length}</span>`, () => showFavPanel(), b => nav.insertBefore(b, nav.firstChild));
-
 // ── 특수 탭 버튼 생성 공통 헬퍼 ──
 function makeSpecialTab(id, cls, innerHtml, onClick, insertFn){
   const b = document.createElement('button');
@@ -1684,6 +1676,9 @@ function makeSpecialTab(id, cls, innerHtml, onClick, insertFn){
   b.onclick = onClick;
   insertFn(b);
 }
+
+// 즐겨찾기 탭 버튼 추가 — nav 맨 앞에 삽입
+makeSpecialTab('tab-fav', 'nav-tab fav-tab', `<span>관심종목</span><span class="cnt">${favs.length}</span>`, () => showFavPanel(), b => nav.insertBefore(b, nav.firstChild));
 
 // 탭·패널 전체 비활성화 헬퍼
 function deactivateAll(){
@@ -1763,6 +1758,15 @@ if(typeof ResizeObserver !== 'undefined'){
 const navPrev = document.getElementById('nav-prev');
 const navNext = document.getElementById('nav-next');
 
+// ── scrollend 폴백 공통 헬퍼 ──
+function onScrollEnd(el, fn){
+  if('onscrollend' in window){
+    el.addEventListener('scrollend', fn, {once: true});
+  } else {
+    setTimeout(fn, 300);
+  }
+}
+
 function updateNavArrows(){
   if(!nav || !navPrev || !navNext) return;
   const atStart = nav.scrollLeft <= 4;
@@ -1774,12 +1778,7 @@ function updateNavArrows(){
 function navScroll(dir){
   if(!nav) return;
   nav.scrollBy({ left: dir * 160, behavior: 'smooth' });
-  // i3: scrollend 지원 브라우저는 이벤트로, 미지원은 setTimeout fallback
-  if('onscrollend' in window){
-    nav.addEventListener('scrollend', updateNavArrows, { once: true });
-  } else {
-    setTimeout(updateNavArrows, 300);
-  }
+  onScrollEnd(nav, updateNavArrows);
 }
 
 nav.addEventListener('scroll', updateNavArrows);
