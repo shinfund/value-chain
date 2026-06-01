@@ -1629,7 +1629,11 @@ function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   </div>`;
 }
 function getFavStocks(){
-  return favs.map(n => STOCK_MAP.get(n)).filter(Boolean);
+  // favIdx: 실제 favs 배열 인덱스 함께 반환 (moveFav 인덱스 불일치 방지)
+  return favs.map((n, favIdx) => {
+    const entry = STOCK_MAP.get(n);
+    return entry ? { ...entry, favIdx } : null;
+  }).filter(Boolean);
 }
 
 function moveFav(idx, dir){
@@ -1648,11 +1652,11 @@ function renderFavPanel(){
   }
   const hint = favs.length > 1 ? '<div class="fav-order-hint">▲▼ 버튼으로 순서 변경</div>' : '';
   const total = favs.length;
-  const items = getFavStocks().map(({st, tabName, stageName}, idx) => {
+  const items = getFavStocks().map(({st, tabName, stageName, favIdx}, i) => {
     const footer = total > 1 ? `<div class="fav-card-footer">
-      <span class="fav-card-footer-label">${idx+1} / ${total}</span>
-      <button class="fav-move-btn" onclick="moveFav(${idx},-1)" ${idx===0?'disabled':''} aria-label="위로">▲ 위로</button>
-      <button class="fav-move-btn" onclick="moveFav(${idx},1)" ${idx===total-1?'disabled':''} aria-label="아래로">▼ 아래로</button>
+      <span class="fav-card-footer-label">${i+1} / ${total}</span>
+      <button class="fav-move-btn" onclick="moveFav(${favIdx},-1)" ${favIdx===0?'disabled':''} aria-label="위로">▲ 위로</button>
+      <button class="fav-move-btn" onclick="moveFav(${favIdx},1)" ${favIdx===favs.length-1?'disabled':''} aria-label="아래로">▼ 아래로</button>
     </div>` : '';
     return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer)}</div>`;
   }).join('');
