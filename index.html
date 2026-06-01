@@ -81,7 +81,7 @@ body{
 .nav-tab.on{background:var(--sky50); color:var(--sky800)}
 .nav-tab:focus-visible{outline:2px solid var(--sky); outline-offset:1px}
 .nav-tab .cnt{display:none;}
-.nav-tab.fav-tab .cnt,.nav-tab.cross-tab .cnt{
+.nav-tab.fav-tab .cnt{
   display:inline-flex; align-items:center; justify-content:center;
   vertical-align:middle; font-size:11px; font-weight:800;
   padding:1px 6px; border-radius:20px; line-height:1.4; min-width:18px;
@@ -144,10 +144,6 @@ body{
 .stock-link:hover .stock-link-icon{opacity:1;}
 .stock-link:hover{color:var(--sky600);}
 .stock-link-icon{font-size:11px; color:var(--sky600); opacity:0.45; transition:opacity .15s; flex-shrink:0;}
-.xmark{
-  font-size:9px; font-weight:800; padding:1px 6px; border-radius:20px;
-  background:var(--purple50); color:var(--purple800); flex-shrink:0; letter-spacing:.02em;
-}
 .lead{
   font-size:11px; font-weight:800; padding:2px 9px; border-radius:20px;
   flex-shrink:0; letter-spacing:.04em;
@@ -169,19 +165,6 @@ body{
 }
 .disc b{font-weight:800}
 
-/* ── 교차 종목 탭 ── */
-.nav-tab.cross-tab{color:var(--purple800);}
-.nav-tab.cross-tab.on{background:var(--purple50); color:var(--purple800);}
-.nav-tab.cross-tab .cnt{background:var(--purple50); color:var(--purple800);}
-.nav-tab.cross-tab.on .cnt{background:var(--purple); color:#fff;}
-#cross-panel{display:none; animation:fadeIn .2s ease;}
-#cross-panel.vis{display:block;}
-.cross-section-hd{
-  font-size:12px; font-weight:800; color:var(--txt3);
-  padding:6px 2px; letter-spacing:.02em;
-  border-bottom:1px solid var(--border2); margin-bottom:8px; margin-top:4px;
-}
-.cross-section-hd:first-child{margin-top:0}
 
 /* ── 리스크 텍스트 강조 ── */
 .stock-desc .risk{
@@ -275,7 +258,7 @@ body{
 }
 .hist-date::before{content:'🕐'; font-size:11px; opacity:.7;}
 .hist-date.hl{color:var(--teal);}
-.hist-date.hl::before{content:'🕐'; color:var(--teal); opacity:1;}
+.hist-date.hl::before{color:var(--teal); opacity:1;}
 .hist-body{color:var(--txt); line-height:1.7; font-weight:500;}
 .hist-body ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px;}
 .hist-body li{display:flex; align-items:baseline; gap:5px; font-size:13px; line-height:1.7;}
@@ -543,7 +526,7 @@ body{
         <h1>주식 밸류체인</h1>
         <div class="hdr-sub">
           <span>분야별 핵심 종목 · 밸류체인 단계별 정리</span>
-          <span class="hdr-date" id="hdr-date">업데이트 2026.06.01</span>
+          <span class="hdr-date" id="hdr-date"></span>
         </div>
       </div>
     </div>
@@ -556,7 +539,6 @@ body{
   <div class="main">
     <div id="home-panel"></div>
     <div id="fav-panel"></div>
-    <div id="cross-panel"></div>
     <div id="content">
     </div>
   </div>
@@ -588,7 +570,6 @@ const DATA = [
           history:[
             {upd:'2026-05-30', d:'\'26.02 업계 최초 HBM4 양산 출하(13Gb 성능). 엔비디아 베라루빈용 HBM4 최종 검증 통과·6월 공급 시작. AMD MI400 주공급사 지명. HBM 점유율 Q1 30% 회복·수율 60% 육박. ⚠️리스크: HBM4 수율 추가 개선 필요(70%+ 목표), 엔비디아 루빈 출하 지연 영향'},
             {upd:'2026-05-10', d:'HBM4 수율 개선 진행 중. AMD MI455X 공급사 지명 확인. D램 점유율 회복 구간. ⚠️리스크: 엔비디아향 점유율 회복 속도 여전히 관건'},
-            {upd:'2026-04-20', d:'HBM4 수율 개선 진행 중. AMD MI455X 공급사 지명 확인. D램 점유율 회복 구간. ⚠️리스크: 엔비디아향 점유율 회복 속도 여전히 관건'},
           ],
           d:'HBM4 루빈 최종 qual 통과·6월 엔비디아 양산 공급 시작·AMD MI400 주공급 확정. HBM 점유율 17%→30% 회복 시나리오(카운터포인트리서치). 수율 60% 육박·1c D램 핫테스트 수율 80% 돌파. 1c 개발팀 30명 자사주 4.8억 지급(성과 인정). HBM 출하량 2026년 전년比 2.5배+ 전망(업계). ⚠️리스크: HBM4 수율 70% 달성 여부가 점유율 관건, 루빈 출하 일부 지연 보도(SK 물량 20~30% 조정 가능성), 고밸류 DS부문'},
       ]},
@@ -1132,14 +1113,18 @@ function tierLabel(t){
   return '<span class="lead t3">성장</span>';
 }
 
-// 교차 뱃지 헬퍼 — panelHTML·favCardHTML·renderFavPanel 공통 사용
-function xmarkHTML(st){
-  return st.x ? `<span class="xmark">${esc('교차')}</span>` : '';
-}
-
 // ── [r3] 섹터 총 종목 수 집계 헬퍼 ──
 function countStocks(d){
   return d.stages.reduce((a, s) => a + s.stocks.length, 0);
+}
+
+// ── 섹터 내 가장 최근 upd 날짜 반환 헬퍼 (panelHTML·renderHomePanel 공용) ──
+function getSectorLatestUpd(d){
+  let latest = '';
+  d.stages.forEach(s => s.stocks.forEach(st => {
+    if(st.upd && (!latest || st.upd > latest)) latest = st.upd;
+  }));
+  return latest;
 }
 
 // ── [r2] 날짜 diff → 표시 label 공통 헬퍼 ──
@@ -1153,18 +1138,12 @@ function dayDiffLabel(upd){
   return {diff, label};
 }
 
-// ── [r1] 리스크 파싱 공통 헬퍼 ──
-// riskSpanClass: 메인 카드용 'risk' | 이력용 'hist-risk'
+// ── [r1] 리스크 파싱 공통 헬퍼 ── (메인 카드 전용)
 function splitRisk(escaped, riskSpanClass){
   const riskMark = '⚠️리스크:';
   const idx = escaped.indexOf(riskMark);
   const main = (idx === -1 ? escaped : escaped.slice(0, idx)).trim();
   const risk = idx === -1 ? '' : escaped.slice(idx + riskMark.length).trim();
-  // 이력 카드(hist-risk)는 기존 인라인 텍스트 유지
-  if(riskSpanClass !== 'risk') {
-    const riskHTML = risk ? `<span class="${riskSpanClass}">⚠️ 리스크 ${risk}</span>` : '';
-    return main + riskHTML;
-  }
   const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(risk)}</span>` : '';
   return mainToBullets(main) + riskHTML;
 }
@@ -1214,12 +1193,11 @@ function buildHistHTML(hist){
   const items = hist.map((h, i) => {
     const {label} = dayDiffLabel(h.upd);
     const isLatest = i === 0;
-    // 이력 본문: mainToBullets 적용 (종목 설명과 동일)
-    const escaped = esc(h.d);
+    // 이력 본문: 원문을 전달 — mainToBullets/riskToBullets 내부에서 esc() 처리
     const riskMark = '⚠️리스크:';
-    const riskIdx = escaped.indexOf(riskMark);
-    const mainText = (riskIdx === -1 ? escaped : escaped.slice(0, riskIdx)).trim();
-    const riskText = riskIdx === -1 ? '' : escaped.slice(riskIdx + riskMark.length).trim();
+    const rawIdx = h.d.indexOf(riskMark);
+    const mainText = (rawIdx === -1 ? h.d : h.d.slice(0, rawIdx)).trim();
+    const riskText = rawIdx === -1 ? '' : h.d.slice(rawIdx + riskMark.length).trim();
     const mainHTML = mainToBullets(mainText);
     const riskHTML = riskText ? `<span class="hist-risk"><span style="font-size:11px;font-weight:700;">⚠️ 리스크</span> ${riskToBullets(riskText)}</span>` : '';
     return `<div class="hist-item">
@@ -1296,7 +1274,7 @@ function panelHTML(d){
       return `
       <div class="stock${isKey ? ' stock-key' : ''}" data-name="${esc(st.n)}" data-code="${esc(st.code||'')}">
         <div class="stock-top">
-          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>
+          <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}<span class="stock-link-icon">&#x2197;</span></a>
           <span style="display:flex;align-items:center;gap:4px">${isKey ? '<span class="key-badge">★ 핵심</span>' : ''}${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
         <div class="stock-desc">${splitRisk(esc(st.d), 'risk')}</div>
@@ -1315,10 +1293,7 @@ function panelHTML(d){
     </div>`);
   });
   // 섹터 내 최신 upd 동적 산출 → 면책 날짜에 반영
-  let latestUpdDisc = '';
-  d.stages.forEach(s => s.stocks.forEach(st => {
-    if(st.upd && (!latestUpdDisc || st.upd > latestUpdDisc)) latestUpdDisc = st.upd;
-  }));
+  const latestUpdDisc = getSectorLatestUpd(d);
   const discDate = latestUpdDisc
     ? latestUpdDisc.replace(/^(\d{4})-(\d{2})-\d{2}$/, (_, y, m) => y + '년 ' + m + '월')
     : '최신';
@@ -1419,7 +1394,17 @@ function onKey(e, idx) {
     // WAI-ARIA tablist 권고 — ArrowDown 시 활성 패널로 포커스 이동
     e.preventDefault();
     const panel = panels[idx];
-    if(panel) panel.focus();
+    if(panel){
+      panel.focus();
+    } else {
+      // 홈·관심·교차 탭(panels 범위 밖) — 해당 패널 직접 참조
+      const activeTab = document.querySelector('.nav-tab.on');
+      if(activeTab){
+        const tid = activeTab.id;
+        const targetPanel = tid === 'tab-home' ? homePanel : tid === 'tab-fav' ? favPanel : null;
+        if(targetPanel) targetPanel.focus();
+      }
+    }
     return;
   }
   const allTabs = Array.from(nav.querySelectorAll('.nav-tab'));
@@ -1438,7 +1423,6 @@ window.addEventListener('hashchange', () => {
   const key = location.hash.slice(1);
   if(key === 'home' || !key){ showHomePanel(); return; }
   if(key === 'fav'){ showFavPanel(); return; }
-  if(key === 'cross'){ showCrossPanel(); return; }
   const i = DATA.findIndex(d => d.key === key);
   if(i >= 0 && i !== current) show(i);
 });
@@ -1448,7 +1432,6 @@ window.addEventListener('hashchange', () => {
 // ══════════════════════════════════════
 const homePanel = document.getElementById('home-panel');
 const favPanel  = document.getElementById('fav-panel');
-const crossPanel = document.getElementById('cross-panel');
 
 // 섹터 강도 → dot 클래스 + 라벨 (DATA.strength.type 단일 소스)
 const STRENGTH_LABEL = {pos:'실적 동반', warn:'기대 단계'};
@@ -1488,8 +1471,7 @@ function renderHomePanel(){
     const keyNames = keyList.map(n => `<span class="home-key-name">${esc(n)}</span>`).join('');
 
     // 가장 최근 upd
-    let latestUpd = '';
-    d.stages.forEach(s => s.stocks.forEach(st => { if(st.upd && (!latestUpd || st.upd > latestUpd)) latestUpd = st.upd; }));
+    const latestUpd = getSectorLatestUpd(d);
     const {diff: updDiff, label: updLabel} = latestUpd ? dayDiffLabel(latestUpd) : {diff:99, label:''};
     const updCls = updDiff <= 7 ? 'home-upd recent' : 'home-upd old';
 
@@ -1629,7 +1611,7 @@ function syncAllFavBtns(){
 // footerHTML → 순서 버튼 등 (선택), uidSuffix → 중복 uid 방지용
 function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   const isFav = favs.includes(st.n);
-  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}${xmarkHTML(st)}<span class="stock-link-icon">&#x2197;</span></a>`;
+  const nameEl = `<a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}<span class="stock-link-icon">&#x2197;</span></a>`;
   const uid = 'fav_' + (st.code||st.n.replace(/\s/g,'')) + (uidSuffix ? '_'+uidSuffix : '');
   return `<div class="search-result-item">
     <div class="search-result-meta">
@@ -1664,10 +1646,9 @@ function moveFav(idx, dir){
 }
 
 function renderFavPanel(){
-  const panel = favPanel;
-  if(!panel.classList.contains('vis')) return;
+  if(!favPanel.classList.contains('vis')) return;
   if(favs.length === 0){
-    panel.innerHTML = '<div class="fav-empty">⭐ 관심종목이 없습니다.<br>카드 우측 ☆ 버튼으로 추가하세요.</div>';
+    favPanel.innerHTML = '<div class="fav-empty">⭐ 관심종목이 없습니다.<br>카드 우측 ☆ 버튼으로 추가하세요.</div>';
     return;
   }
   const hint = favs.length > 1 ? '<div class="fav-order-hint">▲▼ 버튼으로 순서 변경</div>' : '';
@@ -1680,7 +1661,7 @@ function renderFavPanel(){
     </div>` : '';
     return `<div class="fav-item-row">${favCardHTML(st, tabName, stageName, footer)}</div>`;
   }).join('');
-  panel.innerHTML = hint + items;
+  favPanel.innerHTML = hint + items;
 }
 
 function updateFavTab(){
@@ -1689,17 +1670,20 @@ function updateFavTab(){
 }
 
 // 즐겨찾기 탭 버튼 추가 — nav 맨 앞에 삽입
-(function addFavTab(){
+makeSpecialTab('tab-fav', 'nav-tab fav-tab', `<span>관심종목</span><span class="cnt">${favs.length}</span>`, () => showFavPanel(), b => nav.insertBefore(b, nav.firstChild));
+
+// ── 특수 탭 버튼 생성 공통 헬퍼 ──
+function makeSpecialTab(id, cls, innerHtml, onClick, insertFn){
   const b = document.createElement('button');
-  b.className = 'nav-tab fav-tab';
-  b.id = 'tab-fav';
+  b.className = cls;
+  b.id = id;
   b.type = 'button';
   b.setAttribute('role', 'tab');
   b.setAttribute('aria-selected', 'false');
-  b.innerHTML = `<span>관심종목</span><span class="cnt">${favs.length}</span>`;
-  b.onclick = () => showFavPanel();
-  nav.insertBefore(b, nav.firstChild);
-})();
+  b.innerHTML = innerHtml;
+  b.onclick = onClick;
+  insertFn(b);
+}
 
 // 탭·패널 전체 비활성화 헬퍼
 function deactivateAll(){
@@ -1709,9 +1693,6 @@ function deactivateAll(){
   const favTab = document.getElementById('tab-fav');
   if(favTab) favTab.classList.remove('on');
   if(favPanel) favPanel.classList.remove('vis');
-  const crossTab = document.getElementById('tab-cross');
-  if(crossTab) crossTab.classList.remove('on');
-  if(crossPanel) crossPanel.classList.remove('vis');
   // 홈 패널 비활성화
   const homeTab = document.getElementById('tab-home');
   if(homeTab) homeTab.classList.remove('on');
@@ -1740,100 +1721,18 @@ function showFavPanel(){
 syncAllFavBtns();
 updateFavTab();
 
-// ══════════════════════════════════════
-// 교차 종목 모아보기
-// ══════════════════════════════════════
-function getCrossStocks(){
-  const result = [];
-  DATA.forEach(d => {
-    d.stages.forEach(s => {
-      s.stocks.forEach(st => {
-        if(st.x) result.push({st, tabName:d.name, stageName:s.t, tabIcon:d.icon});
-      });
-    });
-  });
-  return result;
-}
-
-function renderCrossPanel(){
-  const panel = crossPanel;
-  if(!panel.classList.contains('vis')) return;
-  const list = getCrossStocks();
-  if(list.length === 0){
-    panel.innerHTML = '<div class="fav-empty">교차 종목이 없습니다.</div>';
-    return;
-  }
-  // 탭별 그룹핑
-  const groups = {};
-  list.forEach(({st, tabName, stageName, tabIcon}) => {
-    const key = tabName;
-    if(!groups[key]) groups[key] = {tabName, tabIcon, items:[]};
-    groups[key].items.push({st, stageName});
-  });
-  let html = '';
-  Object.values(groups).forEach(g => {
-    const sortedItems = [...g.items].sort((a, b) => Number(a.st.tier) - Number(b.st.tier));
-    html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${g.items.length}종목</div>`;
-    html += '<div class="grid" style="margin-bottom:14px">';
-    sortedItems.forEach(({st, stageName}) => {
-      html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''));
-    });
-    html += '</div>';
-  });
-  panel.innerHTML = html;
-  syncAllFavBtns();
-}
-
-// ── URL 해시 안전 교체 헬퍼 (r3: 3곳 중복 제거) ──
+// ── URL 해시 안전 교체 헬퍼 ──
 function safeReplaceHash(hash){
   try{ if(location.hash.slice(1) !== hash) history.replaceState(null,'','#'+hash); }catch(e){}
 }
 
-function showCrossPanel(){
-  deactivateAll();
-  const crossTab = document.getElementById('tab-cross');
-  if(crossTab) crossTab.classList.add('on');
-  current = -3;
-  crossPanel.classList.add('vis');
-  renderCrossPanel();
-  window.scrollTo({top:0, behavior:'instant'});
-  safeReplaceHash('cross');
-}
-
-// 교차 탭 버튼 추가 — 관심종목 탭 뒤에 삽입
-(function addCrossTab(){
-  const crossCount = getCrossStocks().length;
-  const b = document.createElement('button');
-  b.className = 'nav-tab cross-tab';
-  b.id = 'tab-cross';
-  b.type = 'button';
-  b.setAttribute('role', 'tab');
-  b.setAttribute('aria-selected', 'false');
-  b.innerHTML = `<span>교차종목</span><span class="cnt">${crossCount}</span>`;
-  b.onclick = () => showCrossPanel();
-  const favTab = document.getElementById('tab-fav');
-  if(favTab && favTab.nextSibling) nav.insertBefore(b, favTab.nextSibling);
-  else nav.appendChild(b);
-})();
-
 // 홈 탭 버튼 추가 — 모든 특수 탭 삽입 후 맨 마지막에 실행 → insertBefore(firstChild)로 맨 좌측 확보
-(function addHomeTab(){
-  const b = document.createElement('button');
-  b.className = 'nav-tab home-tab';
-  b.id = 'tab-home';
-  b.type = 'button';
-  b.setAttribute('role', 'tab');
-  b.setAttribute('aria-selected', 'false');
-  b.innerHTML = `<span>홈</span>`;
-  b.onclick = () => showHomePanel();
-  nav.insertBefore(b, nav.firstChild);
-})();
+makeSpecialTab('tab-home', 'nav-tab home-tab', `<span>홈</span>`, () => showHomePanel(), b => nav.insertBefore(b, nav.firstChild));
 
 // ── 초기 진입: 해시가 있으면 해당 패널로, 없으면 홈 그리드로 시작 ──
 (function initPage(){
   const hash = location.hash.slice(1);
   if(hash === 'fav'){ showFavPanel(); return; }
-  if(hash === 'cross'){ showCrossPanel(); return; }
   const i = DATA.findIndex(d => d.key === hash);
   if(i >= 0){ show(i); return; }
   // 해시 없음 또는 미인식 → 홈
@@ -1853,6 +1752,11 @@ window.addEventListener('resize', () => { applyHeaderOffset(); updateNavArrows()
 // [버그 수정] 폰트 로드 완료 후 헤더 높이 재측정 (폰트 미로드 시 높이 오차 방지)
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => { applyHeaderOffset(); updateNavArrows(); });
+}
+
+// [개선] ResizeObserver — hdr-wrap 높이가 콘텐츠 변화로 달라질 때도 자동 재측정
+if(typeof ResizeObserver !== 'undefined'){
+  new ResizeObserver(() => applyHeaderOffset()).observe(document.querySelector('.hdr-wrap'));
 }
 
 // ── 탭 좌우 스크롤 버튼 ──
