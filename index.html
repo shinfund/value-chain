@@ -1744,11 +1744,7 @@ makeSpecialTab('tab-home', 'nav-tab home-tab', `<span>홈</span>`, () => showHom
 
 // ── 초기 진입: 해시가 있으면 해당 패널로, 없으면 홈 그리드로 시작 ──
 (function initPage(){
-  const hash = location.hash.slice(1);
-  if(hash === 'fav'){ showFavPanel(); return; }
-  const i = DATA.findIndex(d => d.key === hash);
-  if(i >= 0){ show(i); return; }
-  // 해시 없음 또는 미인식 → 홈
+  // 항상 홈으로 시작 (이전 세션 해시 무시)
   try { history.replaceState(null, '', location.pathname + '#home'); } catch(e){}
   showHomePanel();
 })();
