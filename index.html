@@ -218,18 +218,17 @@ body{
   padding:8px 0 6px; display:flex; flex-direction:column; gap:7px;
 }
 .glossary-item{
-  display:flex; gap:8px; align-items:flex-start;
-  padding:7px 10px; border-radius:var(--r8);
+  display:flex; flex-direction:column; gap:3px;
+  padding:8px 11px; border-radius:var(--r8);
   background:var(--sky50);
 }
 .glossary-term{
-  flex-shrink:0; font-size:12px; font-weight:800;
-  color:var(--sky800); min-width:64px; line-height:1.5;
-  padding-top:1px;
+  font-size:13px; font-weight:800;
+  color:var(--sky800); line-height:1.4; letter-spacing:.01em;
 }
 .glossary-def{
-  font-size:12px; color:var(--txt2); font-weight:400;
-  line-height:1.65;
+  font-size:13px; color:var(--txt); font-weight:500;
+  line-height:1.7;
 }
 
 /* ── 업데이트 날짜 ── */
@@ -266,21 +265,30 @@ body{
   border-left:3px solid var(--border);
 }
 .hist-item{
-  display:flex; gap:8px; padding:5px 0;
+  display:flex; flex-direction:column; gap:4px; padding:7px 0;
   border-bottom:1px solid var(--border2); font-size:12px;
 }
 .hist-item:last-child{border-bottom:none; padding-bottom:2px;}
 .hist-date{
-  flex-shrink:0; font-weight:700; color:var(--txt3); font-size:11px;
-  min-width:52px; line-height:1.6;
+  font-weight:800; color:var(--txt2); font-size:12.5px;
+  line-height:1.4; display:flex; align-items:center; gap:5px;
 }
+.hist-date::before{content:'🕐'; font-size:11px; opacity:.7;}
 .hist-date.hl{color:var(--teal);}
-.hist-body{color:var(--txt2); line-height:1.65; flex:1; font-weight:400;}
+.hist-date.hl::before{content:'🕐'; color:var(--teal); opacity:1;}
+.hist-body{color:var(--txt); line-height:1.7; font-weight:500;}
+.hist-body ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px;}
+.hist-body li{display:flex; align-items:baseline; gap:5px; font-size:13px; line-height:1.7;}
+.hist-body li::before{content:'•'; color:var(--sky600); font-size:13px; flex-shrink:0; font-weight:900; line-height:1.6;}
 .hist-body .hist-risk{
-  display:block; margin-top:3px;
-  font-size:11px; color:var(--amber800); font-weight:600;
-  background:var(--amber50); border-radius:5px; padding:3px 7px;
+  display:block; margin-top:5px;
+  font-size:13px; color:var(--amber800); font-weight:600;
+  background:var(--amber50); border-radius:6px; padding:6px 10px;
+  line-height:1.7;
 }
+.hist-body .hist-risk ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px;}
+.hist-body .hist-risk li{display:flex; align-items:baseline; gap:5px; font-size:13px; line-height:1.7;}
+.hist-body .hist-risk li::before{content:'•'; color:var(--amber); font-size:13px; flex-shrink:0; font-weight:900; line-height:1.6;}
 
 
 /* ── 핵심 종목 뱃지 ── */
@@ -535,7 +543,7 @@ body{
         <h1>주식 밸류체인</h1>
         <div class="hdr-sub">
           <span>분야별 핵심 종목 · 밸류체인 단계별 정리</span>
-          <span class="hdr-date">업데이트 2026.06.01</span>
+          <span class="hdr-date" id="hdr-date">업데이트 2026.06.01</span>
         </div>
       </div>
     </div>
@@ -1096,6 +1104,19 @@ const content = document.getElementById('content');
 // key → sector 객체 Map (applyHomeTierFilter O(1) 조회용)
 const DATA_MAP = new Map(DATA.map(d => [d.key, d]));
 
+// ── 앱 업데이트 날짜 단일 관리 ──
+// DATA 전체 종목 중 가장 최신 upd를 자동 산출 → 헤더 날짜 한 곳만 수정하면 전체 반영
+(function setAppUpdDate(){
+  let latest = '';
+  DATA.forEach(d => d.stages.forEach(s => s.stocks.forEach(st => {
+    if(st.upd && (!latest || st.upd > latest)) latest = st.upd;
+  })));
+  if(!latest) return;
+  const [y, m, day] = latest.split('-');
+  const el = document.getElementById('hdr-date');
+  if(el) el.textContent = `업데이트 ${y}.${m}.${day}`;
+})();
+
 // XSS 방지: innerHTML 주입 전 이스케이프
 function esc(v){
   return String(v).replace(/[&<>"']/g, c => (
@@ -1161,18 +1182,17 @@ function riskToBullets(text){
   return `<ul>${items}</ul>`;
 }
 
+
 // ── 메인 설명 텍스트 → 불릿 목록 변환 ──
-// ". " 또는 ". '" 기준으로 문장 분리, 2문장 이상일 때만 <ul> 적용
+// ". " 기준으로 문장 분리, 2문장 이상일 때만 <ul> 적용
 function mainToBullets(text){
   if(!text) return text;
-  // ". " 뒤에 대문자·한글·숫자·따옴표가 오는 지점에서 분리
-  // 단, 숫자+마침표(1. 2. 등 목록 번호) 및 약어(yoy, +X.X%) 등 오탐 방지
   const raw = text
     .split(/\.\s+(?=[A-Z가-힣0-9\'\"\`\[—\-])/)
     .map(s => s.replace(/\.$/, '').trim())
     .filter(s => s.length > 0);
-  if(raw.length < 2) return text;
-  const items = raw.map(s => `<li>${s}</li>`).join('');
+  if(raw.length < 2) return esc(text);
+  const items = raw.map(s => `<li>${esc(s)}</li>`).join('');
   return `<ul>${items}</ul>`;
 }
 
@@ -1194,8 +1214,18 @@ function buildHistHTML(hist){
   const items = hist.map((h, i) => {
     const {label} = dayDiffLabel(h.upd);
     const isLatest = i === 0;
-    const body = splitRisk(esc(h.d), 'hist-risk');
-    return `<div class="hist-item"><span class="hist-date${isLatest?' hl':''}">${esc(label)}</span><span class="hist-body">${body}</span></div>`;
+    // 이력 본문: mainToBullets 적용 (종목 설명과 동일)
+    const escaped = esc(h.d);
+    const riskMark = '⚠️리스크:';
+    const riskIdx = escaped.indexOf(riskMark);
+    const mainText = (riskIdx === -1 ? escaped : escaped.slice(0, riskIdx)).trim();
+    const riskText = riskIdx === -1 ? '' : escaped.slice(riskIdx + riskMark.length).trim();
+    const mainHTML = mainToBullets(mainText);
+    const riskHTML = riskText ? `<span class="hist-risk"><span style="font-size:11px;font-weight:700;">⚠️ 리스크</span> ${riskToBullets(riskText)}</span>` : '';
+    return `<div class="hist-item">
+      <span class="hist-date${isLatest?' hl':''}">${esc(label)}</span>
+      <span class="hist-body">${mainHTML}${riskHTML}</span>
+    </div>`;
   }).join('');
   return `<div class="hist-list">${items}</div>`;
 }
@@ -1249,9 +1279,9 @@ function panelHTML(d){
   }
   parts.push(`<div class="intro">
     <h2>${esc(d.icon)} ${esc(d.name)}</h2>
-    <div class="desc">${mainToBullets(esc(d.desc))}</div>
+    <div class="desc">${mainToBullets(d.desc)}</div>
     <div class="strength ${isPos ? 'pos' : 'warn'}">
-      <span class="strength-label">${isPos ? '📈 투자 포인트' : '⚠️ 주의 사항'}</span><span>${mainToBullets(esc(d.strength.txt))}</span>
+      <span class="strength-label">${isPos ? '📈 투자 포인트' : '⚠️ 주의 사항'}</span><span>${mainToBullets(d.strength.txt)}</span>
     </div>
     ${glossaryHTML}
   </div>`);
@@ -1284,7 +1314,15 @@ function panelHTML(d){
       <div class="grid">${cards}</div>
     </div>`);
   });
-  parts.push(`<div class="disc"><b>⚠️ 투자 유의</b> · 본 자료는 2026년 5월 기준 최신 실적·수주 정보를 반영한 밸류체인 참고용이며, 특정 종목 매수 추천이 아닙니다. 미래 테마주 다수는 기대가 주가에 선반영되어 밸류에이션이 높고 변동성이 큽니다. <b>독보적 기술력 ≠ 좋은 매수 시점</b> — 실제 진입은 전저점 종가 확인 후 분할 진입 등 별도 전략으로 리스크를 관리하세요. 최종 투자 판단은 반드시 본인이 직접 하세요.</div>`);
+  // 섹터 내 최신 upd 동적 산출 → 면책 날짜에 반영
+  let latestUpdDisc = '';
+  d.stages.forEach(s => s.stocks.forEach(st => {
+    if(st.upd && (!latestUpdDisc || st.upd > latestUpdDisc)) latestUpdDisc = st.upd;
+  }));
+  const discDate = latestUpdDisc
+    ? latestUpdDisc.replace(/^(\d{4})-(\d{2})-\d{2}$/, (_, y, m) => y + '년 ' + m + '월')
+    : '최신';
+  parts.push(`<div class="disc"><b>⚠️ 투자 유의</b> · 본 자료는 ${discDate} 기준 최신 실적·수주 정보를 반영한 밸류체인 참고용이며, 특정 종목 매수 추천이 아닙니다. 미래 테마주 다수는 기대가 주가에 선반영되어 밸류에이션이 높고 변동성이 큽니다. <b>독보적 기술력 ≠ 좋은 매수 시점</b> — 실제 진입은 전저점 종가 확인 후 분할 진입 등 별도 전략으로 리스크를 관리하세요. 최종 투자 판단은 반드시 본인이 직접 하세요.</div>`);
   return parts.join('');
 }
 
@@ -1370,6 +1408,9 @@ function show(idx, focusTab) {
 
   // URL 해시 연동
   safeReplaceHash(DATA[idx].key);
+
+  // 즐겨찾기 버튼 상태 동기화 (★/☆)
+  syncAllFavBtns();
 }
 
 // 키보드 네비게이션: ←→, Home, End — nav 전체 탭 순환 (홈·관심·교차 포함)
@@ -1413,8 +1454,6 @@ const crossPanel = document.getElementById('cross-panel');
 const STRENGTH_LABEL = {pos:'실적 동반', warn:'기대 단계'};
 function sectorStrength(d){
   const type = d.strength ? d.strength.type : 'warn';
-  // STRENGTH_MAP 라벨이 섹터마다 달랐으나 DATA.strength.txt 앞부분으로 대체
-  // 간결 라벨은 type 기반으로 통일 (홈카드는 짧은 라벨만 표시)
   return {cls: type, label: STRENGTH_LABEL[type] || '기대 단계'};
 }
 
@@ -1698,8 +1737,6 @@ function showFavPanel(){
   safeReplaceHash('fav');
 }
 
-// 해시 #fav 초기 처리
-if(location.hash === '#fav') showFavPanel();
 syncAllFavBtns();
 updateFavTab();
 
@@ -1736,7 +1773,7 @@ function renderCrossPanel(){
   let html = '';
   Object.values(groups).forEach(g => {
     const sortedItems = [...g.items].sort((a, b) => Number(a.st.tier) - Number(b.st.tier));
-    html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${Number(g.items.length)}종목</div>`;
+    html += `<div class="cross-section-hd">${esc(g.tabIcon)} ${esc(g.tabName)} · ${g.items.length}종목</div>`;
     html += '<div class="grid" style="margin-bottom:14px">';
     sortedItems.forEach(({st, stageName}) => {
       html += favCardHTML(st, g.tabName, stageName, '', g.tabName.replace(/\s/g,''));
@@ -1765,8 +1802,7 @@ function showCrossPanel(){
 
 // 교차 탭 버튼 추가 — 관심종목 탭 뒤에 삽입
 (function addCrossTab(){
-  const crossCount = DATA.reduce((a, d) =>
-    a + d.stages.reduce((b, s) => b + s.stocks.filter(st => st.x).length, 0), 0);
+  const crossCount = getCrossStocks().length;
   const b = document.createElement('button');
   b.className = 'nav-tab cross-tab';
   b.id = 'tab-cross';
@@ -1793,12 +1829,14 @@ function showCrossPanel(){
   nav.insertBefore(b, nav.firstChild);
 })();
 
-// 해시 #cross 초기 처리
-if(location.hash === '#cross') showCrossPanel();
-
-// ── 초기 진입: 항상 홈 그리드로 시작 ──
-// 브라우저 캐시·이전 해시 잔류 방지를 위해 무조건 홈으로 초기화
+// ── 초기 진입: 해시가 있으면 해당 패널로, 없으면 홈 그리드로 시작 ──
 (function initPage(){
+  const hash = location.hash.slice(1);
+  if(hash === 'fav'){ showFavPanel(); return; }
+  if(hash === 'cross'){ showCrossPanel(); return; }
+  const i = DATA.findIndex(d => d.key === hash);
+  if(i >= 0){ show(i); return; }
+  // 해시 없음 또는 미인식 → 홈
   try { history.replaceState(null, '', location.pathname + '#home'); } catch(e){}
   showHomePanel();
 })();
