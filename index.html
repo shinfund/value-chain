@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Value-chain · 2026</title>
+<title>Value chain</title>
 <!-- [개선] @import 렌더 블로킹 제거 → <link preload> + <link stylesheet> 방식으로 교체 -->
 <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"></noscript>
@@ -1473,7 +1473,8 @@ function showHomePanel(){
   current = -4;
   renderHomePanel();
   window.scrollTo({top:0, behavior:'instant'});
-  safeReplaceHash('home');
+  // 홈은 해시 없는 clean URL 유지
+  try{ if(location.hash) history.replaceState(null,'',location.pathname); }catch(e){}
 }
 
 function showFromHome(idx){
@@ -1913,7 +1914,7 @@ async function loadData(){
 
 // ── 초기 진입 ──
 (function initPage(){
-  try { history.replaceState(null, '', location.pathname + '#home'); } catch(e){}
+  try { history.replaceState(null, '', location.pathname); } catch(e){}
   updateCfgStatus();
   // Worker URL이 있으면 자동 로드, 없으면 설정 모달
   if(CFG.workerUrl){
