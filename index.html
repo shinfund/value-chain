@@ -1040,7 +1040,7 @@ function splitRisk(raw, riskSpanClass){
   const idx = raw.indexOf(RISK_MARK);
   const main = (idx === -1 ? raw : raw.slice(0, idx)).trim();
   const risk = idx === -1 ? '' : raw.slice(idx + RISK_MARK.length).trim();
-  const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(esc(risk))}</span>` : '';
+  const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(risk)}</span>` : '';
   return mainToBullets(main) + riskHTML;
 }
 
@@ -1063,7 +1063,7 @@ function riskToBullets(text){
 function mainToBullets(text){
   if(!text) return text;
   const raw = text
-    .split(/(?:\.\s+(?=[A-Z가-힣0-9\'\"\`\[—\-])|·\s+)/)
+    .split(/(?:\.\s+(?=[A-Za-z가-힣0-9\'\"\`\[—\-])|·\s+)/)
     .map(s => s.replace(/\.$/, '').trim())
     .filter(s => s.length > 0);
   if(raw.length < 2) return esc(text);
@@ -1417,7 +1417,7 @@ function renderHomePanel(){
 
 function buildHomeTierFilterBar(){
   const cnt = {
-    all: DATA.length,
+    all: countSectorsByTier('all'),
     '1': countSectorsByTier('1'),
     '2': countSectorsByTier('2'),
     '3': countSectorsByTier('3'),
