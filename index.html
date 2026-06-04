@@ -608,7 +608,6 @@ body{
 <body>
 <!-- 토스트 -->
 <div id="toast"></div>
-<!-- 로딩 오버레이 -->
 
 <!-- Notion 설정 모달 -->
 <div id="cfgModal">
@@ -983,7 +982,8 @@ const DEMO_DATA = [
 
 const nav = document.getElementById('nav');
 const content = document.getElementById('content');
-let navPrev, navNext; // 선언만 — 하단에서 getElementById로 할당
+const navPrev = document.getElementById('nav-prev');
+const navNext = document.getElementById('nav-next');
 // key → sector 객체 Map (applyHomeTierFilter O(1) 조회용)
 let DATA_MAP = new Map();
 // ── 종목명 → {st, tabName, stageName} 역방향 Map (getFavStocks 매 호출 재순회 방지) ──
@@ -1035,12 +1035,12 @@ function dayDiffLabel(upd){
   return {diff, label};
 }
 
-// ── [r1] 리스크 파싱 공통 헬퍼 ── (메인 카드 전용)
-function splitRisk(escaped, riskSpanClass){
-  const idx = escaped.indexOf(RISK_MARK);
-  const main = (idx === -1 ? escaped : escaped.slice(0, idx)).trim();
-  const risk = idx === -1 ? '' : escaped.slice(idx + RISK_MARK.length).trim();
-  const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(risk)}</span>` : '';
+// ── [r1] 리스크 파싱 공통 헬퍼 ── (메인 카드·즐겨찾기 공용) — 원문(raw) 기준
+function splitRisk(raw, riskSpanClass){
+  const idx = raw.indexOf(RISK_MARK);
+  const main = (idx === -1 ? raw : raw.slice(0, idx)).trim();
+  const risk = idx === -1 ? '' : raw.slice(idx + RISK_MARK.length).trim();
+  const riskHTML = risk ? `<span class="${riskSpanClass}"><span class="risk-label">⚠️ 리스크</span>${riskToBullets(esc(risk))}</span>` : '';
   return mainToBullets(main) + riskHTML;
 }
 
@@ -1052,8 +1052,8 @@ function riskToBullets(text){
     .split(/,\s+/)
     .map(s => s.trim())
     .filter(s => s.length > 0);
-  if(raw.length < 2) return text;
-  const items = raw.map(s => `<li>${s}</li>`).join('');
+  if(raw.length < 2) return esc(text);
+  const items = raw.map(s => `<li>${esc(s)}</li>`).join('');
   return `<ul>${items}</ul>`;
 }
 
@@ -1129,7 +1129,7 @@ function toggleHist(uid){
 }
 
 // ── 종목 설명 렌더링: ⚠️리스크 부분을 별도 블록으로 분리 ──
-// formatDesc 래퍼 제거 — splitRisk(esc(st.d), 'risk') 직접 사용
+// formatDesc 래퍼 제거 — splitRisk(st.d, 'risk') 직접 사용 (원문 기준, 내부 esc 처리)
 
 function panelHTML(d){
   const isPos = d.strength.type === 'pos';
@@ -1172,7 +1172,7 @@ function panelHTML(d){
           <a class="stock-name stock-link" href="${st.code ? 'https://m.stock.naver.com/domestic/stock/'+esc(st.code)+'/total' : '#'}" target="_blank" rel="noopener noreferrer">${esc(st.n)}<span class="stock-link-icon">&#x2197;</span></a>
           <span style="display:flex;align-items:center;gap:4px">${isKey ? '<span class="key-badge">★ 핵심</span>' : ''}${tierLabel(st.tier)}<button class="fav-btn" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">☆</button></span>
         </div>
-        <div class="stock-desc">${splitRisk(esc(st.d), 'risk')}</div>
+        <div class="stock-desc">${splitRisk(st.d, 'risk')}</div>
         ${updDateHTML(st.upd, st.history||[], uid)}
       </div>`;
     }).join('');
@@ -1241,12 +1241,6 @@ function rebuildApp(){
     panels.push(p);
   });
 
-  // 헤더 업데이트 날짜
-  let latest = '';
-  DATA.forEach(d => d.stages.forEach(s => s.stocks.forEach(st => {
-    if(st.upd && (!latest || st.upd > latest)) latest = st.upd;
-  })));
-
   // 즐겨찾기 동기화
   syncAllFavBtns();
   updateFavTab();
@@ -1264,7 +1258,7 @@ function show(idx, focusTab) {
   if (current === idx) return;
   current = idx;
 
-  // 특수 탭·패널(즐겨찾기·교차) 비활성화는 deactivateAll 공통 헬퍼 사용 (r2)
+  // 특수 탭·패널(즐겨찾기) 비활성화는 deactivateAll 공통 헬퍼 사용 (r2)
   deactivateAll();
 
   // content 영역 복원
@@ -1309,7 +1303,7 @@ function show(idx, focusTab) {
   syncAllFavBtns();
 }
 
-// 키보드 네비게이션: ←→, Home, End — nav 전체 탭 순환 (홈·관심·교차 포함)
+// 키보드 네비게이션: ←→, Home, End — nav 전체 탭 순환 (홈·관심 포함)
 function onKey(e, idx) {
   if (e.key === 'ArrowDown') {
     // WAI-ARIA tablist 권고 — ArrowDown 시 활성 패널로 포커스 이동
@@ -1318,7 +1312,7 @@ function onKey(e, idx) {
     if(panel){
       panel.focus();
     } else {
-      // 홈·관심·교차 탭(panels 범위 밖) — 해당 패널 직접 참조
+      // 홈·관심 탭(panels 범위 밖) — 해당 패널 직접 참조
       const activeTab = document.querySelector('.nav-tab.on');
       if(activeTab){
         const tid = activeTab.id;
@@ -1527,7 +1521,7 @@ function syncAllFavBtns(){
   document.querySelectorAll('.fav-btn').forEach(b => syncFavBtn(b));
 }
 
-// ── 공통 카드 HTML (즐겨찾기·교차 패널 공용) ──
+// ── 공통 카드 HTML (즐겨찾기 패널 공용) ──
 // footerHTML → 순서 버튼 등 (선택), uidSuffix → 중복 uid 방지용
 function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
   const isFav = favs.includes(st.n);
@@ -1542,7 +1536,7 @@ function favCardHTML(st, tabName, stageName, footerHTML, uidSuffix){
       ${nameEl}
       <span style="display:flex;align-items:center;gap:4px">${tierLabel(st.tier)}<button class="fav-btn ${isFav?'on':''}" data-name="${esc(st.n)}" onclick="toggleFav(this)" aria-label="즐겨찾기">${isFav?'★':'☆'}</button></span>
     </div>
-    <div class="stock-desc">${splitRisk(esc(st.d), 'risk')}</div>
+    <div class="stock-desc">${splitRisk(st.d, 'risk')}</div>
     ${updDateHTML(st.upd, st.history||[], uid)}
     ${footerHTML||''}
   </div>`;
@@ -1779,7 +1773,6 @@ function getText(p){
 function parseNotionData(sectorPages, stockPages){
   // 섹터 pageId → sector 객체 맵
   const sectorById = {};
-  const sectorOrder = {};
   sectorPages.forEach(page => {
     const pr = page.properties || {};
     const key         = String(getText(pr['key'])    || '').trim();
@@ -1795,7 +1788,6 @@ function parseNotionData(sectorPages, stockPages){
     sectorById[page.id] = { key, name, icon, desc,
       strength: { type: s_type, txt: s_txt },
       glossary, stages: [], _order: order };
-    sectorOrder[page.id] = order;
   });
 
   // 종목을 섹터별·stage별로 분류
@@ -1840,7 +1832,13 @@ function parseNotionData(sectorPages, stockPages){
     const stock = { n, tier, upd, d };
     if(code) stock.code = code;
     if(history.length) stock.history = history;
-    stageObj.stocks.push(stock);
+    // 동일 stage 내 중복 종목 방어 — 같은 종목명이 이미 있으면 upd가 더 최신인 것으로 교체
+    const dupIdx = stageObj.stocks.findIndex(s => s.n === n);
+    if(dupIdx === -1){
+      stageObj.stocks.push(stock);
+    } else if((upd || '') > (stageObj.stocks[dupIdx].upd || '')){
+      stageObj.stocks[dupIdx] = stock; // 최신 upd로 교체
+    }
   });
 
   // 섹터 순서 정렬
@@ -1867,9 +1865,6 @@ function parseNotionData(sectorPages, stockPages){
       return s;
     }); // _order 제거
 }
-
-// ── 로딩 오버레이 ──
-
 
 // ── 메인 데이터 로드 ──
 async function loadData(){
@@ -1908,16 +1903,12 @@ async function loadData(){
     else if(msg.includes('Failed to fetch')) msg = '네트워크 오류 — Worker URL 확인';
     toast('⚠ ' + msg);
     updateCfgStatus('err');
+  } finally {
     // 스피너 해제
     if(syncBtn){ syncBtn.disabled=false; }
     if(syncIcon){ syncIcon.classList.remove('spinning'); }
     if(syncLabel){ syncLabel.textContent='새로고침'; }
-    return;
   }
-  // 스피너 해제
-  if(syncBtn){ syncBtn.disabled=false; }
-  if(syncIcon){ syncIcon.classList.remove('spinning'); }
-  if(syncLabel){ syncLabel.textContent='새로고침'; }
 }
 
 // ── 초기 진입 ──
@@ -1941,9 +1932,6 @@ function applyHeaderOffset() {
   const m = document.querySelector('.main');
   if (h && m) m.style.paddingTop = (h.offsetHeight + 8) + 'px';
 }
-// ── 탭 좌우 스크롤 버튼 ──
-navPrev = document.getElementById('nav-prev');
-navNext = document.getElementById('nav-next');
 
 applyHeaderOffset();
 window.addEventListener('resize', () => { applyHeaderOffset(); updateNavArrows(); });
