@@ -72,21 +72,6 @@ body{
 @keyframes spin-icon{to{transform:rotate(360deg)}}
 .spinning{animation:spin-icon .8s linear infinite; display:inline-block;}
 
-/* ── 로딩 오버레이 ── */
-#loadingOverlay{
-  display:none; position:fixed; inset:0; z-index:200;
-  background:rgba(245,248,255,.88); backdrop-filter:blur(4px);
-  flex-direction:column; align-items:center; justify-content:center; gap:14px;
-}
-#loadingOverlay.vis{display:flex;}
-.loading-spinner{
-  width:42px; height:42px; border-radius:50%;
-  border:4px solid var(--sky100); border-top-color:var(--sky);
-  animation:spin .8s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{font-size:14px; font-weight:700; color:var(--sky800);}
-
 /* ── 설정 모달 ── */
 /* ── CFG MODAL ── */
 #cfgModal{display:none;}
@@ -624,10 +609,7 @@ body{
 <!-- 토스트 -->
 <div id="toast"></div>
 <!-- 로딩 오버레이 -->
-<div id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-txt" id="loadingTxt">노션 DB 불러오는 중...</div>
-</div>
+
 <!-- Notion 설정 모달 -->
 <div id="cfgModal">
   <div class="modal-backdrop" onclick="closeCfgModal(event)">
@@ -1861,16 +1843,33 @@ function parseNotionData(sectorPages, stockPages){
     stageObj.stocks.push(stock);
   });
 
-  // 순서대로 정렬
+  // 섹터 순서 정렬
   return Object.values(sectorById)
     .filter(s => s.stages.length > 0)
     .sort((a, b) => a._order - b._order)
-    .map(({ _order, ...s }) => s); // _order 제거
+    .map(({ _order, ...s }) => {
+      // ── 스테이지 자동 정렬 ──
+      // 우선순위 1: stage_sub에 "최상단" 포함 → 0
+      // 우선순위 2: tier1 종목 수 많은 순
+      // 우선순위 3: 등장(push) 순서 유지 (_si)
+      s.stages = s.stages
+        .map((st, idx) => ({ ...st, _si: idx }))
+        .sort((a, b) => {
+          const aTop = a.s && a.s.includes('최상단') ? 0 : 1;
+          const bTop = b.s && b.s.includes('최상단') ? 0 : 1;
+          if (aTop !== bTop) return aTop - bTop;
+          const aTier1 = a.stocks.filter(x => Number(x.tier) === 1).length;
+          const bTier1 = b.stocks.filter(x => Number(x.tier) === 1).length;
+          if (bTier1 !== aTier1) return bTier1 - aTier1;
+          return a._si - b._si;
+        })
+        .map(({ _si, ...st }) => st);
+      return s;
+    }); // _order 제거
 }
 
 // ── 로딩 오버레이 ──
-function showLoading(msg){ const o=document.getElementById('loadingOverlay'),t=document.getElementById('loadingTxt'); if(o)o.classList.add('vis'); if(t)t.textContent=msg||'불러오는 중...'; }
-function hideLoading(){ const o=document.getElementById('loadingOverlay'); if(o)o.classList.remove('vis'); }
+
 
 // ── 메인 데이터 로드 ──
 async function loadData(){
@@ -1885,17 +1884,14 @@ async function loadData(){
   if(syncBtn){ syncBtn.disabled=true; }
   if(syncIcon){ syncIcon.classList.add('spinning'); }
   if(syncLabel){ syncLabel.textContent='로딩 중...'; }
-  showLoading('섹터 DB 조회 중...');
   try{
     // 1. 섹터 DB 전체 조회
     const sectorPages = await fetchAllPages(
       CFG.sectorDbId,
       [{ property:'순서', direction:'ascending' }]
     );
-    document.getElementById('loadingTxt').textContent = '종목 DB 조회 중...';
     // 2. 종목 DB 전체 조회
     const stockPages = await fetchAllPages(CFG.stockDbId);
-    document.getElementById('loadingTxt').textContent = '데이터 변환 중...';
     // 3. DATA[] 구성
     const newData = parseNotionData(sectorPages, stockPages);
     if(!newData.length) throw new Error('섹터 데이터가 없습니다 — DB ID를 확인하세요');
@@ -1905,7 +1901,6 @@ async function loadData(){
     toast(`Notion 로드 완료 — ${sectorPages.length}개 섹터 · ${stockPages.length}개 종목`);
     updateCfgStatus('ok');
   }catch(e){
-    hideLoading();
     let msg = e.message || '알 수 없는 오류';
     if(msg.includes('401')||msg.includes('403')) msg = '인증 오류 — Worker API 키 확인';
     else if(msg.includes('404')) msg = 'DB를 찾을 수 없음 — DB ID 확인';
@@ -1919,7 +1914,6 @@ async function loadData(){
     if(syncLabel){ syncLabel.textContent='새로고침'; }
     return;
   }
-  hideLoading();
   // 스피너 해제
   if(syncBtn){ syncBtn.disabled=false; }
   if(syncIcon){ syncIcon.classList.remove('spinning'); }
