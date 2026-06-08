@@ -1800,7 +1800,7 @@ function parseNotionData(sectorPages, stockPages){
     const key         = String(getText(pr['key'])    || '').trim();
     const name        = String(getText(pr['섹터명'])  || '').trim();
     const icon        = String(getText(pr['icon'])   || '').trim();
-    const desc        = String(getText(pr['desc'])   || '').trim();
+    const desc        = String(getText(pr['summary']) || getText(pr['desc']) || '').trim();
     const s_type      = String(getText(pr['strength_type']) || 'pos').trim();
     const s_txt       = String(getText(pr['strength_txt'])  || '').trim();
     const order       = Number(getText(pr['순서']) || 99);
